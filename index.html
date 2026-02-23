@@ -3,214 +3,260 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>姐姐的私人动态空间</title>
+    <title>姐姐的个人网站8.2.0</title>
     <style>
-        :root { --main: #d4a373; --bg: #faf9f6; --danger: #ff4d4d; --white: #ffffff; }
-        body { background: var(--bg); font-family: 'PingFang SC', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
+        :root { --main: #d4a373; --bg: #faf9f6; --white: #ffffff; }
+        body { background: var(--bg); font-family: -apple-system, sans-serif; margin: 0; padding-top: 70px; }
         
-        /* 导航栏 */
         header { 
             position: fixed; top: 0; width: 100%; height: 60px; 
-            background: rgba(255,255,255,0.85); backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.9); backdrop-filter: blur(10px);
             display: flex; justify-content: space-between; align-items: center; 
             padding: 0 20px; box-sizing: border-box; z-index: 1000; border-bottom: 1px solid #eee;
         }
-        .logo { color: var(--main); font-weight: bold; letter-spacing: 1px; }
+        .logo { color: var(--main); font-weight: bold; font-size: 1.1rem; }
 
-        /* 三条杠菜单按钮 */
-        .menu-btn { cursor: pointer; border: none; background: none; display: flex; flex-direction: column; gap: 5px; z-index: 2001; padding: 10px; }
-        .menu-btn span { width: 25px; height: 2px; background: var(--main); border-radius: 2px; transition: 0.3s; }
+        .menu-btn { cursor: pointer; border: none; background: none; display: flex; flex-direction: column; gap: 5px; padding: 10px; }
+        .menu-btn span { width: 22px; height: 2px; background: var(--main); border-radius: 2px; }
 
-        /* 侧边栏 */
-        #sidePanel {
-            position: fixed; top: 0; right: -300px; width: 280px; height: 100%;
-            background: var(--white); z-index: 2000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            padding: 80px 30px; box-sizing: border-box; box-shadow: -5px 0 15px rgba(0,0,0,0.05);
+        #sidePanel { 
+            position: fixed; top: 0; right: -280px; width: 260px; height: 100%; 
+            background: var(--white); z-index: 2000; transition: 0.3s; 
+            padding: 40px 20px; box-sizing: border-box; box-shadow: -5px 0 15px rgba(0,0,0,0.05); 
+            overflow-y: auto;
         }
         #sidePanel.open { right: 0; }
+        .side-label { font-size: 11px; color: #ccc; margin: 20px 0 8px; display: block; text-transform: uppercase; border-bottom: 1px solid #f5f5f5; padding-bottom: 3px; }
+        .side-info { font-size: 14px; color: #666; line-height: 1.6; margin-bottom: 5px; }
+        .version-tag { font-size: 12px; color: var(--main); background: #fdf5eb; padding: 2px 8px; border-radius: 10px; font-weight: bold; }
 
-        .info-section { margin-bottom: 30px; }
-        .info-label { color: #999; font-size: 12px; letter-spacing: 1px; margin-bottom: 8px; display: block; border-bottom: 1px solid #f5f5f5; padding-bottom: 5px; }
-        .info-content { color: #333; font-size: 14px; line-height: 1.6; }
+        .auth-box { margin-top: 10px; padding: 15px; background: #fdfdfd; border: 1px solid #f0f0f0; border-radius: 12px; }
+        .auth-input { width: 100%; padding: 8px; margin-bottom: 8px; border: 1px solid #eee; border-radius: 6px; box-sizing: border-box; font-size: 13px; outline: none; }
+        .auth-input:focus { border-color: var(--main); }
+        .input-hint { font-size: 10px; color: #aaa; margin-top: -5px; margin-bottom: 10px; display: block; line-height: 1.4; }
+        .auth-btn { width: 100%; padding: 8px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; margin-bottom: 5px; font-weight: bold; }
+        .login-btn { background: var(--main); color: white; }
+        .reg-link { font-size: 12px; color: #999; text-align: center; display: block; cursor: pointer; margin-top: 5px; }
 
-        /* 主体内容区 */
-        .container { max-width: 500px; margin: 90px auto 50px; padding: 0 20px; }
-        #tips { text-align: center; color: var(--main); font-size: 13px; margin-bottom: 15px; min-height: 20px; }
+        .container { max-width: 500px; margin: 0 auto; padding: 0 15px; }
+        #status { font-size: 11px; color: #999; text-align: center; margin-bottom: 15px; min-height: 18px; }
 
-        .input-area { background: #fff; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); margin-bottom: 25px; }
-        textarea { width: 100%; height: 85px; border: 1px solid #eee; border-radius: 10px; padding: 12px; box-sizing: border-box; font-size: 16px; outline: none; resize: none; transition: 0.3s; }
-        textarea:focus { border-color: var(--main); }
-        .btn-send { width: 100%; background: var(--main); color: white; border: none; padding: 12px; border-radius: 10px; margin-top: 10px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.3s; }
-        .btn-send:active { transform: scale(0.98); opacity: 0.9; }
-
-        /* 动态卡片 */
-        .card { background: #fff; padding: 20px; border-radius: 15px; margin-bottom: 15px; border-left: 5px solid var(--main); box-shadow: 0 2px 5px rgba(0,0,0,0.02); position: relative; }
-        .time { font-size: 11px; color: #bbb; display: block; margin-bottom: 8px; }
-        .content { color: #444; font-size: 16px; line-height: 1.5; white-space: pre-wrap; word-break: break-all; }
+        .input-card { background: #fff; padding: 20px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); margin-bottom: 25px; }
+        textarea { width: 100%; height: 80px; border: 1px solid #f0f0f0; border-radius: 10px; padding: 12px; box-sizing: border-box; font-size: 15px; outline: none; resize: none; background: #fdfdfd; }
         
-        /* 删除按钮 */
-        .btn-del { 
-            background: none; border: 1px solid #f5f5f5; color: #ddd; 
-            padding: 2px 10px; border-radius: 5px; cursor: pointer; font-size: 11px;
-            float: right; margin-top: 10px; transition: 0.3s;
-        }
-        .btn-del:hover { color: var(--danger); border-color: var(--danger); }
+        .btn-group { display: flex; gap: 10px; margin-top: 10px; }
+        .btn { border: none; border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .btn-pub { flex: 4; background: var(--main); color: white; padding: 12px; font-size: 15px; }
+        .btn-refresh { flex: 1; background: #eee; color: #666; font-size: 20px; }
 
-        /* 遮罩层 */
-        #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.2); display: none; z-index: 1999; backdrop-filter: blur(2px); }
+        .card { background: #fff; padding: 18px; border-radius: 15px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); border-left: 4px solid var(--main); }
+        .author-name { font-size: 13px; font-weight: bold; color: var(--main); margin-bottom: 4px; display: block; }
+        .time { font-size: 10px; color: #ccc; margin-bottom: 8px; display: block; }
+        .text { color: #444; font-size: 14px; line-height: 1.6; white-space: pre-wrap; }
         
-        /* 刷新按钮 */
-        .refresh-btn { position: fixed; bottom: 30px; right: 20px; background: #fff; border: 1px solid var(--main); color: var(--main); width: 50px; height: 50px; border-radius: 25px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); font-size: 12px; z-index: 100; }
+        #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.2); display: none; z-index: 1999; }
+        .rotating { animation: rotate 0.8s linear infinite; }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo">FOR SISTER</div>
-        <div class="menu-btn" onclick="toggleMenu()">
+        <div class="logo">姐姐的个人网站</div>
+        <button class="menu-btn" onclick="toggleMenu()">
             <span></span><span></span><span></span>
-        </div>
+        </button>
     </header>
 
     <div id="overlay" onclick="toggleMenu()"></div>
 
     <div id="sidePanel">
-        <div class="info-section">
-            <span class="info-label">📢 公告</span>
-            <div class="info-content">欢迎来到姐姐的秘密基地！在这里记录的每一句话，都会永远保存在云端。愿姐姐天天开心，好梦常在！</div>
-        </div>
-        <div class="info-section">
-            <span class="info-label">👤 关于作者</span>
-            <div class="info-content">来自最支持你的家人<br>Gemini Collaborative Design</div>
-        </div>
-        <div class="info-section">
-            <span class="info-label">🔖 版本信息</span>
-            <div class="info-content">v5.1.0 (Stable Cloud)</div>
+        <span class="side-label">📢 空间公告</span>
+        <div class="side-info">用户名如果已经有人使用过则无法再次使用哦！</div>
+        
+        <span class="side-label">👤 拥有者</span>
+        <div class="side-info">亲爱的姐姐</div>
+
+        <span class="side-label">VERSION</span>
+        <span class="version-tag">v8.2.0 Stable</span>
+
+        <span class="side-label">USER ACCOUNT</span>
+        <div id="userSection" class="auth-box">
+            <div id="loginForm">
+                <input type="text" id="uName" class="auth-input" placeholder="用户名">
+                <input type="password" id="uPass" class="auth-input" placeholder="密码">
+                <button class="auth-btn login-btn" onclick="handleAuth('login')">登录</button>
+                <span class="reg-link" onclick="toggleAuthMode(true)">没有账号？去注册</span>
+            </div>
+            <div id="regForm" style="display:none">
+                <input type="text" id="rName" class="auth-input" placeholder="设置用户名 (最多7字)">
+                <input type="password" id="rPass" class="auth-input" placeholder="设置密码 (至少6位)">
+                <span class="input-hint">要求：名字≤7字；密码≥6位且包含拼音与数字</span>
+                <button class="auth-btn login-btn" onclick="handleAuth('reg')">注册并登录</button>
+                <span class="reg-link" onclick="toggleAuthMode(false)">已有账号？返回登录</span>
+            </div>
+            <div id="userInfo" style="display:none">
+                <p style="font-size:14px; margin:0 0 10px">当前用户：<b id="currUser" style="color:var(--main)"></b></p>
+                <button class="auth-btn" style="background:#eee; color:#666" onclick="logout()">退出登录</button>
+            </div>
         </div>
     </div>
 
     <div class="container">
-        <div id="tips">正在检查同步连接...</div>
-
-        <div class="input-area">
-            <textarea id="myMsg" placeholder="写下想对姐姐说的话..."></textarea>
-            <button class="btn-send" id="pubBtn" onclick="publish()">同步发布</button>
+        <div id="status">同步中...</div>
+        <div class="input-card">
+            <textarea id="msgInput" placeholder="想说什么？请先登录..."></textarea>
+            <div class="btn-group">
+                <button class="btn btn-pub" onclick="publish()">发布动态</button>
+                <button class="btn btn-refresh" onclick="loadData()"><span id="refreshIcon">↻</span></button>
+            </div>
         </div>
-
         <div id="msgList"></div>
     </div>
 
-    <button class="refresh-btn" onclick="loadData()">刷新</button>
-
     <script>
-        // ================= 配置区 =================
-        const MY_KEY = "$2a$10$lq61umlvFUgmbzVZts9WY.4brTae7F8gCucq2L47zNSOKa4WRKODO"; 
-        const MY_ID = "699c4b22ae596e708f424292"; 
-        const ADMIN_PASSWORD = "123"; // 设置你的删除密码
-        // ==========================================
+        const CONFIG = {
+            KEY: "$2a$10$RhcPZqRZZjdSWEp85cbSb.xngZSGZeda4a25br/od0U9pyqLcKBja", 
+            BIN: "699c4b22ae596e708f424292"
+        };
+
+        let currentUser = localStorage.getItem('sister_user') || null;
 
         function toggleMenu() {
             const panel = document.getElementById('sidePanel');
-            const overlay = document.getElementById('overlay');
             const isOpen = panel.classList.toggle('open');
-            overlay.style.display = isOpen ? 'block' : 'none';
+            document.getElementById('overlay').style.display = isOpen ? 'block' : 'none';
+            updateUserUI();
+        }
+
+        function toggleAuthMode(isReg) {
+            document.getElementById('loginForm').style.display = isReg ? 'none' : 'block';
+            document.getElementById('regForm').style.display = isReg ? 'block' : 'none';
+        }
+
+        function updateUserUI() {
+            const info = document.getElementById('userInfo');
+            const login = document.getElementById('loginForm');
+            const reg = document.getElementById('regForm');
+            if(currentUser) {
+                info.style.display = 'block';
+                login.style.display = reg.style.display = 'none';
+                document.getElementById('currUser').innerText = currentUser;
+            } else {
+                info.style.display = 'none';
+                login.style.display = 'block';
+            }
+        }
+
+        async function handleAuth(type) {
+            const status = document.getElementById('status');
+            status.innerText = "正在验证...";
+            try {
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.BIN}/latest`, { headers: { "X-Master-Key": CONFIG.KEY }});
+                const data = await res.json();
+                let users = data.record.users || [];
+
+                if(type === 'reg') {
+                    const name = document.getElementById('rName').value.trim();
+                    const pass = document.getElementById('rPass').value.trim();
+                    
+                    if(!name || !pass) return alert("请填写完整信息");
+                    
+                    // 1. 名字长度限制 (不超过7字)
+                    if(name.length > 7) {
+                        return alert("【格式错误】名字太长啦，不能超过 7 个字哦！");
+                    }
+
+                    // 2. 名字重复校验
+                    if(users.some(u => u.name.toLowerCase() === name.toLowerCase())) {
+                        return alert("【名字重复】这个名字已经被占用了！");
+                    }
+
+                    // 3. 密码长度限制 (不少于6位)
+                    if(pass.length < 6) {
+                        return alert("【格式错误】密码太短，至少需要 6 个字符！");
+                    }
+
+                    // 4. 密码拼音+数字规则校验
+                    const hasLetter = /[a-zA-Z]/.test(pass);
+                    const hasNumber = /[0-9]/.test(pass);
+                    if(!hasLetter || !hasNumber) {
+                        return alert("【格式错误】密码必须同时包含拼音字母和数字！");
+                    }
+
+                    users.push({name, pass});
+                    await saveToCloud({ ...data.record, users });
+                    currentUser = name;
+                    alert("注册成功！");
+                } else {
+                    const name = document.getElementById('uName').value.trim();
+                    const pass = document.getElementById('uPass').value.trim();
+                    const user = users.find(u => u.name === name && u.pass === pass);
+                    if(!user) return alert("用户名或密码错误");
+                    currentUser = name;
+                }
+                localStorage.setItem('sister_user', currentUser);
+                updateUserUI();
+                toggleMenu();
+            } catch (e) { alert("连接云端失败"); }
+        }
+
+        function logout() {
+            localStorage.removeItem('sister_user');
+            currentUser = null;
+            updateUserUI();
         }
 
         async function loadData() {
-            if(MY_KEY.includes("$2a$10$lq61umlvFUgmbzVZts9WY.4brTae7F8gCucq2L47zNSOKa4WRKODO") || MY_ID.includes("699c4b22ae596e708f424292")) {
-                document.getElementById('tips').innerText = "❌ 请先配置 Key 和 ID";
-                return;
-            }
-            document.getElementById('tips').innerText = "正在从云端获取最新动态...";
+            const icon = document.getElementById('refreshIcon');
+            if(icon) icon.classList.add('rotating');
             try {
-                const res = await fetch(`https://api.jsonbin.io/v3/b/${MY_ID}/latest`, {
-                    headers: { "X-Master-Key": MY_KEY, "Cache-Control": "no-cache" }
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.BIN}/latest?v=${Date.now()}`, {
+                    headers: { "X-Master-Key": CONFIG.KEY }
                 });
                 const data = await res.json();
                 render(data.record.notes || []);
-                document.getElementById('tips').innerText = "✨ 云端数据同步完成";
-            } catch (e) {
-                document.getElementById('tips').innerText = "❌ 连接失败，请检查网络";
-            }
+                document.getElementById('status').innerText = "✨ 已同步最新动态";
+            } catch (e) { }
+            setTimeout(() => { if(icon) icon.classList.remove('rotating'); }, 500);
         }
 
         function render(notes) {
             const list = document.getElementById('msgList');
             list.innerHTML = '';
-            // 倒序：最新的在最上面。realIndex 确保删除时对应原数组位置
-            [...notes].reverse().forEach((n, reverseIndex) => {
-                const realIndex = notes.length - 1 - reverseIndex;
+            [...notes].reverse().forEach(note => {
                 const div = document.createElement('div');
                 div.className = 'card';
-                div.innerHTML = `
-                    <span class="time">${n.time}</span>
-                    <div class="content">${n.content}</div>
-                    <button class="btn-del" onclick="deleteNote(${realIndex})">删除</button>
-                    <div style="clear:both"></div>
-                `;
+                div.innerHTML = `<span class="author-name">👤 ${note.author}</span><span class="time">${note.time}</span><div class="text">${note.content}</div>`;
                 list.appendChild(div);
             });
         }
 
         async function publish() {
-            const txt = document.getElementById('myMsg').value.trim();
-            if(!txt) return;
-            const btn = document.getElementById('pubBtn');
-            btn.disabled = true;
-            document.getElementById('tips').innerText = "正在上传到云端...";
-
+            if(!currentUser) return alert("请先登录！");
+            const input = document.getElementById('msgInput');
+            const content = input.value.trim();
+            if (!content) return;
             try {
-                const res = await fetch(`https://api.jsonbin.io/v3/b/${MY_ID}/latest`, {
-                    headers: { "X-Master-Key": MY_KEY }
-                });
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.BIN}/latest`, { headers: { "X-Master-Key": CONFIG.KEY }});
                 const data = await res.json();
                 let notes = data.record.notes || [];
-                notes.push({ content: txt, time: new Date().toLocaleString() });
-                
-                await fetch(`https://api.jsonbin.io/v3/b/${MY_ID}`, {
-                    method: 'PUT',
-                    headers: { "Content-Type": "application/json", "X-Master-Key": MY_KEY },
-                    body: JSON.stringify({ notes: notes })
-                });
-
-                document.getElementById('myMsg').value = '';
+                notes.push({ author: currentUser, content: content, time: new Date().toLocaleString('zh-CN', { hour12: false }) });
+                await saveToCloud({ ...data.record, notes });
+                input.value = '';
                 loadData();
-            } catch (e) {
-                alert("发布失败，请刷新页面重试");
-            } finally {
-                btn.disabled = false;
-            }
+            } catch (e) { alert("发布失败"); }
         }
 
-        async function deleteNote(index) {
-            const pw = prompt("请输入管理密码确认删除：");
-            if (pw === null) return;
-            if (pw !== ADMIN_PASSWORD) {
-                alert("密码错误，无法删除动态");
-                return;
-            }
-
-            document.getElementById('tips').innerText = "正在销毁云端数据...";
-            try {
-                const res = await fetch(`https://api.jsonbin.io/v3/b/${MY_ID}/latest`, {
-                    headers: { "X-Master-Key": MY_KEY }
-                });
-                const data = await res.json();
-                let notes = data.record.notes || [];
-                notes.splice(index, 1);
-                
-                await fetch(`https://api.jsonbin.io/v3/b/${MY_ID}`, {
-                    method: 'PUT',
-                    headers: { "Content-Type": "application/json", "X-Master-Key": MY_KEY },
-                    body: JSON.stringify({ notes: notes })
-                });
-                loadData();
-            } catch (e) {
-                alert("删除失败");
-            }
+        async function saveToCloud(fullData) {
+            return fetch(`https://api.jsonbin.io/v3/b/${CONFIG.BIN}`, {
+                method: 'PUT',
+                headers: { "Content-Type": "application/json", "X-Master-Key": CONFIG.KEY, "X-Bin-Versioning": "false" },
+                body: JSON.stringify(fullData)
+            });
         }
 
-        window.onload = loadData;
+        window.onload = () => { updateUserUI(); loadData(); };
     </script>
 </body>
 </html>
