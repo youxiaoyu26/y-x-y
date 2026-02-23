@@ -3,111 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>姐姐的个人网站8.2.0</title>
-    <style>
-        :root { --main: #d4a373; --bg: #faf9f6; --white: #ffffff; }
-        body { background: var(--bg); font-family: -apple-system, sans-serif; margin: 0; padding-top: 70px; }
-        
-        header { 
-            position: fixed; top: 0; width: 100%; height: 60px; 
-            background: rgba(255,255,255,0.9); backdrop-filter: blur(10px);
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 0 20px; box-sizing: border-box; z-index: 1000; border-bottom: 1px solid #eee;
+    <title>姐姐的个人空间</title>
+    <style id="dynamicStyle">
+        :root { 
+            --main: #d4a373; 
+            --bg: #faf9f6; 
+            --radius: 12px; 
+            --font: -apple-system, sans-serif;
         }
-        .logo { color: var(--main); font-weight: bold; font-size: 1.1rem; }
-
-        .menu-btn { cursor: pointer; border: none; background: none; display: flex; flex-direction: column; gap: 5px; padding: 10px; }
-        .menu-btn span { width: 22px; height: 2px; background: var(--main); border-radius: 2px; }
-
-        #sidePanel { 
-            position: fixed; top: 0; right: -280px; width: 260px; height: 100%; 
-            background: var(--white); z-index: 2000; transition: 0.3s; 
-            padding: 40px 20px; box-sizing: border-box; box-shadow: -5px 0 15px rgba(0,0,0,0.05); 
-            overflow-y: auto;
+        body { 
+            background: var(--bg); 
+            font-family: var(--font); 
+            margin: 0; padding-top: 65px; 
+            background-size: cover; background-position: center; background-attachment: fixed; 
+            transition: 0.3s; 
         }
+        header { position: fixed; top: 0; width: 100%; height: 55px; background: rgba(255,255,255,0.85); backdrop-filter: blur(10px); display: flex; justify-content: space-between; align-items: center; padding: 0 15px; box-sizing: border-box; z-index: 1000; border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .logo { color: var(--main); font-weight: bold; font-size: 1rem; }
+        .menu-btn { cursor: pointer; border: none; background: none; display: flex; flex-direction: column; gap: 4px; padding: 10px; }
+        .menu-btn span { width: 20px; height: 2px; background: var(--main); border-radius: 2px; }
+
+        /* 侧边栏与公告 */
+        #sidePanel { position: fixed; top: 0; right: -300px; width: 280px; height: 100%; background: #fff; z-index: 2000; transition: 0.3s; padding: 25px 20px; box-sizing: border-box; box-shadow: -5px 0 15px rgba(0,0,0,0.05); overflow-y: auto; }
         #sidePanel.open { right: 0; }
-        .side-label { font-size: 11px; color: #ccc; margin: 20px 0 8px; display: block; text-transform: uppercase; border-bottom: 1px solid #f5f5f5; padding-bottom: 3px; }
-        .side-info { font-size: 14px; color: #666; line-height: 1.6; margin-bottom: 5px; }
-        .version-tag { font-size: 12px; color: var(--main); background: #fdf5eb; padding: 2px 8px; border-radius: 10px; font-weight: bold; }
+        .side-label { font-size: 10px; color: #bbb; margin: 15px 0 8px; display: block; text-transform: uppercase; border-bottom: 1px solid #f5f5f5; padding-bottom: 3px; }
+        .ver-badge { background: var(--main); color: white; padding: 1px 5px; border-radius: 4px; font-size: 9px; margin-bottom: 3px; display: inline-block; }
+        .notice-content { font-size: 12.5px; color: #444; line-height: 1.5; }
 
-        .auth-box { margin-top: 10px; padding: 15px; background: #fdfdfd; border: 1px solid #f0f0f0; border-radius: 12px; }
-        .auth-input { width: 100%; padding: 8px; margin-bottom: 8px; border: 1px solid #eee; border-radius: 6px; box-sizing: border-box; font-size: 13px; outline: none; }
-        .auth-input:focus { border-color: var(--main); }
-        .input-hint { font-size: 10px; color: #aaa; margin-top: -5px; margin-bottom: 10px; display: block; line-height: 1.4; }
-        .auth-btn { width: 100%; padding: 8px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; margin-bottom: 5px; font-weight: bold; }
-        .login-btn { background: var(--main); color: white; }
-        .reg-link { font-size: 12px; color: #999; text-align: center; display: block; cursor: pointer; margin-top: 5px; }
+        /* 登录框增强 */
+        .login-hint { font-size: 10px; color: #999; margin: 4px 0 8px; display: block; }
 
-        .container { max-width: 500px; margin: 0 auto; padding: 0 15px; }
-        #status { font-size: 11px; color: #999; text-align: center; margin-bottom: 15px; min-height: 18px; }
+        /* 动态卡片紧凑型 */
+        .card { 
+            background: rgba(255,255,255,0.9); 
+            padding: 12px 15px; 
+            margin-bottom: 12px; 
+            border-left: 3px solid var(--main); 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+        .card-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+        .author-name { font-size: 11.5px; color: var(--main); font-weight: bold; }
+        .post-time { font-size: 9px; color: #ccc; }
+        .post-text { color: #444; font-size: 13.5px; line-height: 1.45; white-space: pre-wrap; margin-bottom: 8px; }
 
-        .input-card { background: #fff; padding: 20px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); margin-bottom: 25px; }
-        textarea { width: 100%; height: 80px; border: 1px solid #f0f0f0; border-radius: 10px; padding: 12px; box-sizing: border-box; font-size: 15px; outline: none; resize: none; background: #fdfdfd; }
+        /* 按钮并排 */
+        .action-bar { display: flex; border-top: 1px solid #fcfcfc; padding-top: 8px; }
+        .action-btn { flex: 1; font-size: 11px; color: var(--main); cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 4px; padding: 4px 0; }
+        .action-btn:first-child { border-right: 1px solid #f5f5f5; }
+
+        /* 布局容器 */
+        .container { max-width: 480px; margin: 0 auto; padding: 0 12px; }
+        #status { font-size: 10px; color: #999; text-align: center; margin-bottom: 10px; height: 14px; }
+        .input-card { background: rgba(255,255,255,0.9); padding: 15px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+        textarea { width: 100%; height: 60px; border: 1px solid #f0f0f0; padding: 10px; box-sizing: border-box; font-size: 14px; outline: none; resize: none; background: #fdfdfd; }
         
-        .btn-group { display: flex; gap: 10px; margin-top: 10px; }
-        .btn { border: none; border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.2s; }
-        .btn-pub { flex: 4; background: var(--main); color: white; padding: 12px; font-size: 15px; }
-        .btn-refresh { flex: 1; background: #eee; color: #666; font-size: 20px; }
+        .btn { border: none; cursor: pointer; font-weight: bold; transition: 0.2s; border-radius: var(--radius); }
+        /* 修改：发布和刷新按钮并排，发布占75%，刷新占20%，留5%间隙通过gap实现 */
+        .btn-group {
+            display: flex;
+            gap: 5%;
+            margin-top: 8px;
+        }
+        .btn-pub { 
+            flex: 0 0 75%; 
+            background: var(--main); 
+            color: white; 
+            padding: 10px; 
+            font-size: 14px; 
+            box-sizing: border-box;
+        }
+        .btn-refresh { 
+            flex: 0 0 20%; 
+            background: rgba(0,0,0,0.05); 
+            color: #666; 
+            font-size: 18px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            box-sizing: border-box;
+        }
 
-        .card { background: #fff; padding: 18px; border-radius: 15px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); border-left: 4px solid var(--main); }
-        .author-name { font-size: 13px; font-weight: bold; color: var(--main); margin-bottom: 4px; display: block; }
-        .time { font-size: 10px; color: #ccc; margin-bottom: 8px; display: block; }
-        .text { color: #444; font-size: 14px; line-height: 1.6; white-space: pre-wrap; }
+        #devModal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 330px; background: white; z-index: 3000; padding: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); max-height: 80vh; overflow-y: auto; display: none; border-radius: 20px; }
+        #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: none; z-index: 1999; backdrop-filter: blur(4px); }
         
-        #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.2); display: none; z-index: 1999; }
+        .comment-item { background: rgba(0,0,0,0.02); padding: 6px 10px; margin-top: 4px; font-size: 11px; border-radius: 6px; }
         .rotating { animation: rotate 0.8s linear infinite; }
         @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .card, .input-card, .btn, .notice-box { border-radius: var(--radius) !important; }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo">姐姐的个人网站</div>
-        <button class="menu-btn" onclick="toggleMenu()">
-            <span></span><span></span><span></span>
-        </button>
+        <div class="logo">姐姐的个人空间</div>
+        <button class="menu-btn" onclick="toggleMenu()"><span></span><span></span><span></span></button>
     </header>
 
-    <div id="overlay" onclick="toggleMenu()"></div>
+    <div id="overlay" onclick="closeAll()"></div>
 
     <div id="sidePanel">
-        <span class="side-label">📢 空间公告</span>
-        <div class="side-info">用户名如果已经有人使用过则无法再次使用哦！</div>
-        
-        <span class="side-label">👤 拥有者</span>
-        <div class="side-info">亲爱的姐姐</div>
+        <span class="side-label">📢 公告栏</span>
+        <div id="currentNotice">
+            <span class="ver-badge" id="verDisplay">v10.0.0</span>
+            <div class="notice-content" id="noticeText">加载中...</div>
+        </div>
+        <span style="font-size:11px; color:var(--main); cursor:pointer; margin-top:8px; display:block" onclick="toggleHistory()">历史更新记录 ↓</span>
+        <div id="historyBox" style="display:none; margin-top:10px; border-top:1px dashed #eee; padding-top:8px"></div>
 
-        <span class="side-label">VERSION</span>
-        <span class="version-tag">v8.2.0 Stable</span>
-
-        <span class="side-label">USER ACCOUNT</span>
-        <div id="userSection" class="auth-box">
+        <span class="side-label">👤 访客登录</span>
+        <div id="userSection" style="background:#f9f9f9; padding:12px; border-radius:10px; border:1px solid #eee">
             <div id="loginForm">
-                <input type="text" id="uName" class="auth-input" placeholder="用户名">
-                <input type="password" id="uPass" class="auth-input" placeholder="密码">
-                <button class="auth-btn login-btn" onclick="handleAuth('login')">登录</button>
-                <span class="reg-link" onclick="toggleAuthMode(true)">没有账号？去注册</span>
-            </div>
-            <div id="regForm" style="display:none">
-                <input type="text" id="rName" class="auth-input" placeholder="设置用户名 (最多7字)">
-                <input type="password" id="rPass" class="auth-input" placeholder="设置密码 (至少6位)">
-                <span class="input-hint">要求：名字≤7字；密码≥6位且包含拼音与数字</span>
-                <button class="auth-btn login-btn" onclick="handleAuth('reg')">注册并登录</button>
-                <span class="reg-link" onclick="toggleAuthMode(false)">已有账号？返回登录</span>
+                <input type="text" id="uName" style="width:100%; padding:6px; border-radius:6px; border:1px solid #ddd; font-size:12px; box-sizing:border-box" placeholder="你的昵称">
+                <input type="password" id="uPass" style="width:100%; padding:6px; border-radius:6px; border:1px solid #ddd; font-size:12px; margin-top:6px; box-sizing:border-box" placeholder="设置进入密码">
+                <span class="login-hint">🔒 密码不能少于 6 个字符</span>
+                <button class="btn btn-pub" style="width:100%; padding:6px; font-size:12px" onclick="handleAuth()">验证进入</button>
             </div>
             <div id="userInfo" style="display:none">
-                <p style="font-size:14px; margin:0 0 10px">当前用户：<b id="currUser" style="color:var(--main)"></b></p>
-                <button class="auth-btn" style="background:#eee; color:#666" onclick="logout()">退出登录</button>
+                <span style="font-size:12px">欢迎，<b id="currUser" style="color:var(--main)"></b></span>
+                <button class="btn" style="background:#eee; font-size:10px; padding:2px 8px; margin-left:5px" onclick="logout()">注销</button>
             </div>
+        </div>
+
+        <button class="btn" style="background:#444; color:white; width:100%; margin-top:15px; padding:8px; font-size:12px" onclick="showDevAuth()">🛠️ 开发者模式</button>
+        <div id="devAuthArea" style="display:none; margin-top:8px">
+            <input type="password" id="devPassInput" style="width:100%; padding:6px; border-radius:6px; border:1px solid #ddd; box-sizing:border-box" placeholder="口令">
+            <button class="btn btn-pub" style="width:100%; margin-top:5px; padding:6px" onclick="verifyDevPass()">确认进入</button>
+        </div>
+    </div>
+
+    <div id="devModal">
+        <h3 style="margin:0 0 15px; text-align:center; font-size:16px">🛠️ 开发者配置</h3>
+        <div style="background:#f0f7ff; padding:10px; border-radius:10px; margin-bottom:12px">
+            <label style="font-size:11px; font-weight:bold">公告更新</label>
+            <input type="text" id="devVer" style="width:100%; margin-top:4px; padding:5px; font-size:12px; box-sizing:border-box" placeholder="版本号">
+            <textarea id="devNotice" style="width:100%; height:40px; margin-top:4px; padding:5px; font-size:12px; box-sizing:border-box" placeholder="内容..."></textarea>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px">
+            <div><label style="font-size:11px">主色</label><input type="color" id="themeColor" style="width:100%"></div>
+            <div><label style="font-size:11px">背景色</label><input type="color" id="bgColor" style="width:100%"></div>
+        </div>
+        <div style="margin-top:8px"><label style="font-size:11px">背景图 URL</label><input type="text" id="bgUrl" style="width:100%; padding:5px; font-size:12px; box-sizing:border-box"></div>
+        <div style="margin-top:8px">
+            <label style="font-size:11px">UI 圆角: <span id="radiusVal">12px</span></label>
+            <input type="range" id="radiusRange" min="0" max="25" style="width:100%">
+        </div>
+        <div style="display:flex; flex-direction:column; gap:6px; margin-top:15px">
+            <button class="btn btn-pub" onclick="saveSettingsToCloud()">同步发布</button>
+            <button class="btn" style="background:#ff4d4d; color:white; padding:8px" onclick="resetSettings()">重置装修</button>
+            <button class="btn" style="background:#eee; padding:8px" onclick="closeAll()">取消</button>
         </div>
     </div>
 
     <div class="container">
-        <div id="status">同步中...</div>
+        <div id="status">连接中...</div>
         <div class="input-card">
-            <textarea id="msgInput" placeholder="想说什么？请先登录..."></textarea>
+            <textarea id="msgInput" placeholder="在此分享你的动态..."></textarea>
+            <!-- 修改：按钮外层用 btn-group 并排，发布按钮占75%，刷新按钮占20%，通过 flex 比例实现 -->
             <div class="btn-group">
-                <button class="btn btn-pub" onclick="publish()">发布动态</button>
+                <button class="btn btn-pub" onclick="publish()">发布</button>
                 <button class="btn btn-refresh" onclick="loadData()"><span id="refreshIcon">↻</span></button>
             </div>
         </div>
@@ -117,146 +170,141 @@
     <script>
         const CONFIG = {
             KEY: "$2a$10$RhcPZqRZZjdSWEp85cbSb.xngZSGZeda4a25br/od0U9pyqLcKBja", 
-            BIN: "699c4b22ae596e708f424292"
+            BIN: "699c4b22ae596e708f424292",
+            DEV_PASS: "作者最帅"
         };
-
+        const DEFAULT_S = { theme: "#d4a373", bgCol: "#faf9f6", bgImg: "", font: "-apple-system, sans-serif", radius: 12, currentVer: "v1.0", notice: "欢迎光临！", history: [] };
         let currentUser = localStorage.getItem('sister_user') || null;
 
-        function toggleMenu() {
-            const panel = document.getElementById('sidePanel');
-            const isOpen = panel.classList.toggle('open');
-            document.getElementById('overlay').style.display = isOpen ? 'block' : 'none';
-            updateUserUI();
-        }
+        // 【关键改动：登录验证】
+        function handleAuth() {
+            const n = document.getElementById('uName').value.trim();
+            const p = document.getElementById('uPass').value;
 
-        function toggleAuthMode(isReg) {
-            document.getElementById('loginForm').style.display = isReg ? 'none' : 'block';
-            document.getElementById('regForm').style.display = isReg ? 'block' : 'none';
-        }
-
-        function updateUserUI() {
-            const info = document.getElementById('userInfo');
-            const login = document.getElementById('loginForm');
-            const reg = document.getElementById('regForm');
-            if(currentUser) {
-                info.style.display = 'block';
-                login.style.display = reg.style.display = 'none';
-                document.getElementById('currUser').innerText = currentUser;
-            } else {
-                info.style.display = 'none';
-                login.style.display = 'block';
+            if(!n) { alert("请输入昵称"); return; }
+            if(p.length < 6) { 
+                alert("⚠️ 为了安全，密码不能少于 6 个字符！"); 
+                return; 
             }
-        }
-
-        async function handleAuth(type) {
-            const status = document.getElementById('status');
-            status.innerText = "正在验证...";
-            try {
-                const res = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.BIN}/latest`, { headers: { "X-Master-Key": CONFIG.KEY }});
-                const data = await res.json();
-                let users = data.record.users || [];
-
-                if(type === 'reg') {
-                    const name = document.getElementById('rName').value.trim();
-                    const pass = document.getElementById('rPass').value.trim();
-                    
-                    if(!name || !pass) return alert("请填写完整信息");
-                    
-                    // 1. 名字长度限制 (不超过7字)
-                    if(name.length > 7) {
-                        return alert("【格式错误】名字太长啦，不能超过 7 个字哦！");
-                    }
-
-                    // 2. 名字重复校验
-                    if(users.some(u => u.name.toLowerCase() === name.toLowerCase())) {
-                        return alert("【名字重复】这个名字已经被占用了！");
-                    }
-
-                    // 3. 密码长度限制 (不少于6位)
-                    if(pass.length < 6) {
-                        return alert("【格式错误】密码太短，至少需要 6 个字符！");
-                    }
-
-                    // 4. 密码拼音+数字规则校验
-                    const hasLetter = /[a-zA-Z]/.test(pass);
-                    const hasNumber = /[0-9]/.test(pass);
-                    if(!hasLetter || !hasNumber) {
-                        return alert("【格式错误】密码必须同时包含拼音字母和数字！");
-                    }
-
-                    users.push({name, pass});
-                    await saveToCloud({ ...data.record, users });
-                    currentUser = name;
-                    alert("注册成功！");
-                } else {
-                    const name = document.getElementById('uName').value.trim();
-                    const pass = document.getElementById('uPass').value.trim();
-                    const user = users.find(u => u.name === name && u.pass === pass);
-                    if(!user) return alert("用户名或密码错误");
-                    currentUser = name;
-                }
-                localStorage.setItem('sister_user', currentUser);
-                updateUserUI();
-                toggleMenu();
-            } catch (e) { alert("连接云端失败"); }
-        }
-
-        function logout() {
-            localStorage.removeItem('sister_user');
-            currentUser = null;
+            
+            currentUser = n; 
+            localStorage.setItem('sister_user', n); 
             updateUserUI();
+            alert("登录成功！");
+        }
+
+        async function updateCloud(newData) {
+            document.getElementById('status').innerText = "同步中...";
+            try {
+                await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.BIN}`, { 
+                    method: 'PUT', 
+                    headers: { "Content-Type": "application/json", "X-Master-Key": CONFIG.KEY }, 
+                    body: JSON.stringify(newData) 
+                });
+                await loadData();
+            } catch (e) { }
         }
 
         async function loadData() {
-            const icon = document.getElementById('refreshIcon');
-            if(icon) icon.classList.add('rotating');
+            const icon = document.getElementById('refreshIcon'); icon.classList.add('rotating');
             try {
-                const res = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.BIN}/latest?v=${Date.now()}`, {
-                    headers: { "X-Master-Key": CONFIG.KEY }
-                });
-                const data = await res.json();
-                render(data.record.notes || []);
-                document.getElementById('status').innerText = "✨ 已同步最新动态";
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.BIN}/latest?v=${Date.now()}`, { headers: { "X-Master-Key": CONFIG.KEY }});
+                const d = await res.json(); 
+                applyStyles(d.record.settings); 
+                render(d.record.notes || []);
+                document.getElementById('status').innerText = "✨ 空间已刷新";
             } catch (e) { }
-            setTimeout(() => { if(icon) icon.classList.remove('rotating'); }, 500);
+            setTimeout(() => icon.classList.remove('rotating'), 500);
+        }
+
+        function applyStyles(s) {
+            if(!s) s = DEFAULT_S;
+            const root = document.documentElement;
+            root.style.setProperty('--main', s.theme);
+            root.style.setProperty('--bg', s.bgCol);
+            root.style.setProperty('--radius', s.radius + 'px');
+            document.body.style.backgroundImage = s.bgImg ? `url(${s.bgImg})` : 'none';
+            document.getElementById('verDisplay').innerText = s.currentVer;
+            document.getElementById('noticeText').innerText = s.notice;
+            document.getElementById('historyBox').innerHTML = (s.history || []).reverse().map(h => `<div style="font-size:11px; margin-bottom:5px; color:#666"><b>${h.ver}</b>: ${h.text}</div>`).join('');
         }
 
         function render(notes) {
-            const list = document.getElementById('msgList');
-            list.innerHTML = '';
-            [...notes].reverse().forEach(note => {
-                const div = document.createElement('div');
-                div.className = 'card';
-                div.innerHTML = `<span class="author-name">👤 ${note.author}</span><span class="time">${note.time}</span><div class="text">${note.content}</div>`;
+            const list = document.getElementById('msgList'); list.innerHTML = '';
+            [...notes].map((n, i) => ({...n, rIdx: i})).reverse().forEach(note => {
+                const div = document.createElement('div'); div.className = 'card';
+                const comms = (note.comments || []).map((c, ci) => `
+                    <div class="comment-item"><b>${c.user}:</b> ${c.content} <span style="float:right; cursor:pointer" onclick="handleLike(${note.rIdx}, ${ci})">👍 ${c.likes || 0}</span></div>
+                `).join('');
+                div.innerHTML = `
+                    <div class="card-header">
+                        <span class="author-name">👤 ${note.author}</span>
+                        <span class="post-time">${note.time}</span>
+                    </div>
+                    <div class="post-text">${note.content}</div>
+                    <div class="action-bar">
+                        <div class="action-btn" onclick="handleLike(${note.rIdx})">👍 ${note.likes || 0}</div>
+                        <div class="action-btn" onclick="toggleComments(${note.rIdx})">💬 ${(note.comments || []).length}</div>
+                    </div>
+                    <div id="comments-${note.rIdx}" style="display:none; margin-top:8px">
+                        ${comms}
+                        <div style="display:flex; gap:4px; margin-top:6px">
+                            <input type="text" id="comment-input-${note.rIdx}" style="flex:1; padding:4px; font-size:11px; border:1px solid #eee; border-radius:4px" placeholder="写评论...">
+                            <button class="btn btn-pub" style="padding:4px 8px; font-size:10px" onclick="submitComment(${note.rIdx})">发</button>
+                        </div>
+                    </div>
+                `;
                 list.appendChild(div);
             });
         }
 
+        // 基础逻辑...
+        async function handleLike(nIdx, cIdx = null) {
+            const res = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.BIN}/latest`, { headers: { "X-Master-Key": CONFIG.KEY }});
+            const data = await res.json(); let notes = data.record.notes || [];
+            if (cIdx === null) notes[nIdx].likes = (notes[nIdx].likes || 0) + 1;
+            else notes[nIdx].comments[cIdx].likes = (notes[nIdx].comments[cIdx].likes || 0) + 1;
+            await updateCloud({ ...data.record, notes });
+        }
+        async function submitComment(idx) {
+            if(!currentUser) return alert("请登录");
+            const val = document.getElementById(`comment-input-${idx}`).value.trim(); if(!val) return;
+            const res = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.BIN}/latest`, { headers: { "X-Master-Key": CONFIG.KEY }});
+            const data = await res.json(); let notes = data.record.notes || [];
+            if(!notes[idx].comments) notes[idx].comments = [];
+            notes[idx].comments.push({ user: currentUser, content: val, likes: 0 });
+            await updateCloud({ ...data.record, notes });
+        }
         async function publish() {
-            if(!currentUser) return alert("请先登录！");
-            const input = document.getElementById('msgInput');
-            const content = input.value.trim();
-            if (!content) return;
-            try {
-                const res = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.BIN}/latest`, { headers: { "X-Master-Key": CONFIG.KEY }});
-                const data = await res.json();
-                let notes = data.record.notes || [];
-                notes.push({ author: currentUser, content: content, time: new Date().toLocaleString('zh-CN', { hour12: false }) });
-                await saveToCloud({ ...data.record, notes });
-                input.value = '';
-                loadData();
-            } catch (e) { alert("发布失败"); }
+            if(!currentUser) return alert("请登录"); const input = document.getElementById('msgInput'); if(!input.value.trim()) return;
+            const res = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.BIN}/latest`, { headers: { "X-Master-Key": CONFIG.KEY }});
+            const data = await res.json(); let notes = data.record.notes || [];
+            notes.push({ author: currentUser, content: input.value, time: new Date().toLocaleString('zh-CN'), comments: [], likes: 0 });
+            input.value = ''; await updateCloud({ ...data.record, notes });
         }
-
-        async function saveToCloud(fullData) {
-            return fetch(`https://api.jsonbin.io/v3/b/${CONFIG.BIN}`, {
-                method: 'PUT',
-                headers: { "Content-Type": "application/json", "X-Master-Key": CONFIG.KEY, "X-Bin-Versioning": "false" },
-                body: JSON.stringify(fullData)
-            });
+        async function saveSettingsToCloud() {
+            const res = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.BIN}/latest`, { headers: { "X-Master-Key": CONFIG.KEY }});
+            const data = await res.json(); const s = data.record.settings || DEFAULT_S;
+            const v = document.getElementById('devVer').value; const n = document.getElementById('devNotice').value;
+            if(v && n && v !== s.currentVer) { s.history.push({ ver: s.currentVer, text: s.notice }); s.currentVer = v; s.notice = n; }
+            const upd = { ...s, theme: document.getElementById('themeColor').value, bgCol: document.getElementById('bgColor').value, bgImg: document.getElementById('bgUrl').value, radius: document.getElementById('radiusRange').value };
+            await updateCloud({ ...data.record, settings: upd }); closeAll();
         }
-
-        window.onload = () => { updateUserUI(); loadData(); };
+        async function resetSettings() { if(confirm("重置所有装修？")) { const res = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.BIN}/latest`, { headers: { "X-Master-Key": CONFIG.KEY }}); const data = await res.json(); await updateCloud({ ...data.record, settings: DEFAULT_S }); closeAll(); } }
+        function toggleHistory() { const b = document.getElementById('historyBox'); b.style.display = b.style.display === 'block' ? 'none' : 'block'; }
+        function toggleMenu() { document.getElementById('sidePanel').classList.toggle('open'); document.getElementById('overlay').style.display = 'block'; updateUserUI(); }
+        function closeAll() { document.getElementById('devModal').style.display = 'none'; document.getElementById('sidePanel').classList.remove('open'); document.getElementById('overlay').style.display = 'none'; document.getElementById('devAuthArea').style.display='none'; }
+        function showDevAuth() { document.getElementById('devAuthArea').style.display='block'; }
+        function verifyDevPass() { if(document.getElementById('devPassInput').value === CONFIG.DEV_PASS) { document.getElementById('devModal').style.display = 'block'; } else { alert("口令错误"); } }
+        function logout() { localStorage.removeItem('sister_user'); currentUser = null; updateUserUI(); }
+        function updateUserUI() { 
+            document.getElementById('userInfo').style.display = currentUser ? 'block' : 'none'; 
+            document.getElementById('loginForm').style.display = currentUser ? 'none' : 'block'; 
+            if(currentUser) document.getElementById('currUser').innerText = currentUser; 
+        }
+        function toggleComments(id) { const el = document.getElementById(`comments-${id}`); el.style.display = el.style.display === 'block' ? 'none' : 'block'; }
+        document.getElementById('radiusRange').oninput = function() { document.getElementById('radiusVal').innerText = this.value + 'px'; }
+        window.onload = loadData;
     </script>
 </body>
 </html>
