@@ -5,192 +5,164 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>专为姐姐设计的网站！</title>
     <style>
-        :root {
-            --bg: #faf9f6;
-            --main: #d4a373;
-            --white: #ffffff;
-        }
-
-        body { background: var(--bg); font-family: 'PingFang SC', sans-serif; margin: 0; padding: 0; }
-
-        /* 导航栏 */
-        header {
-            position: fixed; top: 0; width: 100%; height: 60px;
-            background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px);
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 20px; box-sizing: border-box; z-index: 1000;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-
-        .logo { color: var(--main); font-weight: bold; }
-
-        /* 三条杠菜单按钮 */
-        .menu-btn { cursor: pointer; border: none; background: none; padding: 10px; z-index: 2001; }
-        .menu-btn div { width: 25px; height: 2px; background: var(--main); margin: 5px 0; }
-
-        /* 侧边栏 */
-        #sidePanel {
-            position: fixed; top: 0; right: -300px; width: 280px; height: 100%;
-            background: var(--white); z-index: 2000; transition: 0.3s;
-            padding: 80px 30px; box-shadow: -5px 0 15px rgba(0,0,0,0.05);
-        }
-        #sidePanel.open { right: 0; }
-
-        /* 内容区 */
-        .main { max-width: 500px; margin: 100px auto; padding: 0 20px; }
-        .input-box { background: var(--white); padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.02); margin-bottom: 30px; }
-        textarea { width: 100%; height: 100px; border: 1px solid #eee; border-radius: 10px; padding: 10px; box-sizing: border-box; outline: none; resize: none; font-size: 16px; }
-        .btn-post { width: 100%; background: var(--main); color: white; border: none; padding: 12px; border-radius: 10px; margin-top: 10px; cursor: pointer; font-size: 16px; font-weight: bold; }
-
-        /* 动态列表 */
-        .item { background: var(--white); padding: 20px; border-radius: 15px; margin-bottom: 15px; border-left: 5px solid var(--main); box-shadow: 0 2px 5px rgba(0,0,0,0.02); position: relative; }
-        .time { font-size: 12px; color: #bbb; display: block; margin-bottom: 8px; }
-        .txt { font-size: 16px; color: #444; white-space: pre-wrap; }
+        :root { --bg: #faf9f6; --main: #d4a373; --white: #ffffff; }
+        body { background: var(--bg); font-family: sans-serif; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; }
         
-        .loading { text-align: center; color: var(--main); margin-bottom: 20px; display: none; }
-        #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.1); display: none; z-index: 1999; }
+        /* 导航 */
+        header { 
+            position: sticky; top: 0; width: 100%; height: 60px; 
+            background: rgba(255,255,255,0.9); backdrop-filter: blur(10px);
+            display: flex; justify-content: center; align-items: center; 
+            border-bottom: 1px solid #eee; z-index: 100;
+        }
+
+        /* 主体 */
+        .container { width: 100%; max-width: 500px; padding: 20px; box-sizing: border-box; }
+        
+        .input-box { background: #fff; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-top: 20px; }
+        textarea { width: 100%; height: 80px; border: 1px solid #eee; border-radius: 10px; padding: 10px; box-sizing: border-box; outline: none; resize: none; font-size: 16px; }
+        .btn { width: 100%; background: var(--main); color: white; border: none; padding: 12px; border-radius: 10px; margin-top: 10px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        .btn:disabled { background: #ccc; }
+
+        /* 状态提示 */
+        #status { text-align: center; color: var(--main); font-size: 14px; margin: 15px 0; min-height: 20px; }
+
+        /* 列表 */
+        .item { background: #fff; padding: 20px; border-radius: 15px; margin-bottom: 15px; border-left: 5px solid var(--main); box-shadow: 0 2px 5px rgba(0,0,0,0.02); animation: fadeIn 0.5s; }
+        .time { font-size: 12px; color: #bbb; display: block; margin-bottom: 5px; }
+        .txt { font-size: 16px; color: #444; white-space: pre-wrap; word-break: break-all; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="logo">专为姐姐设计的网站！</div>
-        <button class="menu-btn" onclick="toggleMenu()">
-            <div></div><div></div><div></div>
-        </button>
-    </header>
+    <header><b style="color:var(--main)">专为姐姐设计的网站！</b></header>
 
-    <div id="overlay" onclick="toggleMenu()"></div>
-
-    <div id="sidePanel">
-        <h3 style="color: var(--main)">公告</h3>
-        <p style="font-size: 14px; color: #666;">这是一个云端同步的私人动态空间。在这里写的每一句话，都会同步给姐姐。</p>
-        <hr style="border: 0.5px solid #eee; margin: 20px 0;">
-        <p style="font-size: 12px; color: #999;">作者: 你的弟弟/妹妹<br>版本: v4.0.0 Cloud</p>
-    </div>
-
-    <div class="main">
+    <div class="container">
         <div class="input-box">
-            <textarea id="msg" placeholder="写下你想对姐姐说的话..."></textarea>
-            <button class="btn-post" id="saveBtn" onclick="saveData()">同步发布</button>
+            <textarea id="msgInp" placeholder="想对姐姐说点什么？内容会同步到云端..."></textarea>
+            <button class="btn" id="postBtn" onclick="doPublish()">同步发布</button>
         </div>
-        <div id="loadStatus" class="loading">正在连接云端...</div>
-        <div id="list"></div>
+
+        <div id="status">正在检查云端连接...</div>
+
+        <div id="msgList"></div>
     </div>
 
     <script>
         // ================= 配置区 =================
-        const MASTER_KEY = "$2a$10$WvH0CTiBe.aiWMuITV2QdupmPD7WmxQDmFyfVSZ7BKUPCy6u.cu8S"; // 刚才在网站复制的钥匙
-        let BIN_ID = "data.metadata.id"; 
+        // 1. 填入你在 jsonbin.io 申请的 X-Master-Key
+        const MASTER_KEY = "$2a$10$WvH0CTiBe.aiWMuITV2QdupmPD7WmxQDmFyfVSZ7BKUPCy6u.cu8S"; 
+        
+        // 2. 第一次运行成功后，把弹窗里的 ID 填在这里
+        let BIN_ID = "这里填你获取到的ID"; 
         // ==========================================
 
-        function toggleMenu() {
-            const panel = document.getElementById('sidePanel');
-            const overlay = document.getElementById('overlay');
-            panel.classList.toggle('open');
-            overlay.style.display = panel.classList.contains('open') ? 'block' : 'none';
-        }
+        const statusEl = document.getElementById('status');
+        const listEl = document.getElementById('msgList');
 
-        // 从云端获取数据
-        async function loadData() {
-            if (!BIN_ID || BIN_ID.includes("获取ID")) {
-                document.getElementById('loadStatus').innerText = "提示：请先在代码中配置 Master Key";
-                document.getElementById('loadStatus').style.display = 'block';
+        // 初始化加载
+        window.onload = async function() {
+            if (MASTER_KEY.includes("$2a$10$WvH0CTiBe.aiWMuITV2QdupmPD7WmxQDmFyfVSZ7BKUPCy6u.cu8S")) {
+                statusEl.innerHTML = "❌ 还没填 Master Key，请用记事本打开 HTML 修改第 130 行";
                 return;
             }
 
-            document.getElementById('loadStatus').style.display = 'block';
-            try {
-                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-                    headers: { "X-Master-Key": MASTER_KEY }
-                });
-                const result = await res.json();
-                render(result.record.notes || []);
-            } catch (err) {
-                console.error("加载失败", err);
+            if (!BIN_ID || BIN_ID.includes("这里填")) {
+                // 如果没有 ID，尝试自动创建一个
+                statusEl.innerText = "正在为您创建专属云端空间...";
+                await createNewBin();
+            } else {
+                // 如果有 ID，直接加载数据
+                fetchData();
             }
-            document.getElementById('loadStatus').style.display = 'none';
-        }
+        };
 
-        // 保存到云端
-        async function saveData() {
-            const text = document.getElementById('msg').value.trim();
-            if (!text) return;
-
-            const btn = document.getElementById('saveBtn');
-            btn.disabled = true;
-            btn.innerText = "正在同步...";
-
-            // 1. 先获取现有数据
-            let currentNotes = [];
+        // 创建新的云端文件
+        async function createNewBin() {
             try {
-                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-                    headers: { "X-Master-Key": MASTER_KEY }
-                });
-                const result = await res.json();
-                currentNotes = result.record.notes || [];
-            } catch (e) {
-                // 如果没有，就初始化
-                currentNotes = [];
-            }
-
-            // 2. 加入新数据
-            const newNote = { content: text, time: new Date().toLocaleString() };
-            currentNotes.push(newNote);
-
-            // 3. 上传回云端
-            try {
-                await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-                    method: 'PUT',
+                const res = await fetch("https://api.jsonbin.io/v3/b", {
+                    method: 'POST',
                     headers: {
                         "Content-Type": "application/json",
-                        "X-Master-Key": MASTER_KEY
+                        "X-Master-Key": MASTER_KEY,
+                        "X-Bin-Private": "true"
                     },
-                    body: JSON.stringify({ notes: currentNotes })
+                    body: JSON.stringify({ notes: [{ content: "欢迎来到姐姐的秘密基地！", time: new Date().toLocaleString() }] })
                 });
-                document.getElementById('msg').value = '';
-                loadData();
-            } catch (err) {
-                alert("发布失败，请检查配置");
+                const data = await res.json();
+                const newId = data.metadata.id;
+                statusEl.innerHTML = `✅ 空间创建成功！<br>请复制此 ID 并填入代码第 131 行：<br><b style="color:red">${newId}</b>`;
+                alert("云端空间已创建！\n\n请复制接下来的 ID 并填回代码中：\n" + newId);
+            } catch (e) {
+                statusEl.innerText = "❌ 创建失败，请检查 Master Key 是否正确";
             }
-            btn.disabled = false;
-            btn.innerText = "同步发布";
         }
 
+        // 获取云端数据并显示
+        async function fetchData() {
+            statusEl.innerText = "正在同步云端内容...";
+            try {
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+                    headers: { "X-Master-Key": MASTER_KEY, "Cache-Control": "no-cache" }
+                });
+                if (!res.ok) throw new Error();
+                const result = await res.json();
+                render(result.record.notes || []);
+                statusEl.innerText = "✨ 云端同步完成";
+            } catch (e) {
+                statusEl.innerText = "❌ 读取失败，请检查 BIN_ID 是否填对";
+            }
+        }
+
+        // 渲染到页面
         function render(notes) {
-            const list = document.getElementById('list');
-            list.innerHTML = '';
-            notes.reverse().forEach(n => {
+            listEl.innerHTML = '';
+            // 倒序显示，最新的在上面
+            [...notes].reverse().forEach(n => {
                 const div = document.createElement('div');
                 div.className = 'item';
                 div.innerHTML = `<span class="time">${n.time}</span><div class="txt">${n.content}</div>`;
-                list.appendChild(div);
+                listEl.appendChild(div);
             });
         }
 
-        // 第一次运行会自动帮你创建一个云端文件（Bin）
-        async function initBin() {
-            if (BIN_ID && !BIN_ID.includes("获取ID")) {
-                loadData();
-                return;
+        // 发布新内容
+        async function doPublish() {
+            const inp = document.getElementById('msgInp');
+            const btn = document.getElementById('postBtn');
+            const content = inp.value.trim();
+            if (!content) return;
+
+            btn.disabled = true;
+            statusEl.innerText = "正在向云端发送...";
+
+            try {
+                // 1. 先拿旧数据
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+                    headers: { "X-Master-Key": MASTER_KEY }
+                });
+                const result = await res.json();
+                let notes = result.record.notes || [];
+
+                // 2. 加新数据
+                notes.push({ content: content, time: new Date().toLocaleString() });
+
+                // 3. 覆盖存回去
+                await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                    method: 'PUT',
+                    headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY },
+                    body: JSON.stringify({ notes: notes })
+                });
+
+                inp.value = '';
+                await fetchData(); // 重新刷新显示
+            } catch (e) {
+                alert("发布失败，请刷新重试");
+            } finally {
+                btn.disabled = false;
             }
-            
-            const res = await fetch("https://api.jsonbin.io/v3/b", {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-Master-Key": MASTER_KEY,
-                    "X-Bin-Private": "true"
-                },
-                body: JSON.stringify({ notes: [] })
-            });
-            const data = await res.json();
-            console.log("你的新 BIN_ID 是: ", data.metadata.id);
-            alert("已成功创建云端空间！请查看浏览器控制台(F12)，复制 ID 并填入代码中。");
-        }
-
-        if (MASTER_KEY !== "$2a$10$WvH0CTiBe.aiWMuITV2QdupmPD7WmxQDmFyfVSZ7BKUPCy6u.cu8S") {
-            initBin();
         }
     </script>
 </body>
