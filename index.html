@@ -3,149 +3,206 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>专为姐姐设计的网站！</title>
+    <title>姐姐的私人动态空间</title>
     <style>
-        :root { --bg: #faf9f6; --main: #d4a373; }
-        body { background: var(--bg); font-family: sans-serif; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; }
-        header { position: sticky; top: 0; width: 100%; height: 60px; background: #fff; display: flex; justify-content: center; align-items: center; border-bottom: 1px solid #eee; z-index: 100; }
-        .container { width: 100%; max-width: 500px; padding: 20px; box-sizing: border-box; }
+        :root { --main: #d4a373; --bg: #faf9f6; --danger: #ff4d4d; --white: #ffffff; }
+        body { background: var(--bg); font-family: 'PingFang SC', sans-serif; margin: 0; padding: 0; }
         
-        /* 关键显示区域 */
-        #status-board { 
-            background: #fffbe6; border: 1px solid #ffe58f; padding: 15px; 
-            border-radius: 10px; margin: 20px 0; text-align: center; color: #856404;
-            font-size: 14px; line-height: 1.8;
+        /* 导航栏 */
+        header { 
+            position: fixed; top: 0; width: 100%; height: 60px; 
+            background: rgba(255,255,255,0.85); backdrop-filter: blur(10px);
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 0 20px; box-sizing: border-box; z-index: 1000; border-bottom: 1px solid #eee;
         }
-        .id-highlight { color: #f5222d; font-weight: bold; font-size: 18px; background: #fff; padding: 2px 8px; border: 1px dashed #f5222d; }
 
-        .input-box { background: #fff; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        textarea { width: 100%; height: 80px; border: 1px solid #eee; border-radius: 10px; padding: 10px; box-sizing: border-box; outline: none; resize: none; font-size: 16px; }
-        .btn { width: 100%; background: var(--main); color: white; border: none; padding: 12px; border-radius: 10px; margin-top: 10px; cursor: pointer; font-size: 16px; }
+        /* 三条杠按钮 */
+        .menu-btn { cursor: pointer; border: none; background: none; display: flex; flex-direction: column; gap: 5px; z-index: 2001; }
+        .menu-btn span { width: 25px; height: 2px; background: var(--main); border-radius: 2px; transition: 0.3s; }
+
+        /* 侧边栏 */
+        #sidePanel {
+            position: fixed; top: 0; right: -300px; width: 280px; height: 100%;
+            background: var(--white); z-index: 2000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 80px 30px; box-sizing: border-box; box-shadow: -5px 0 15px rgba(0,0,0,0.05);
+        }
+        #sidePanel.open { right: 0; }
+
+        .info-section { margin-bottom: 30px; }
+        .info-label { color: #999; font-size: 12px; letter-spacing: 1px; margin-bottom: 8px; display: block; }
+        .info-content { color: #333; font-size: 14px; line-height: 1.6; }
+
+        /* 主体内容 */
+        .container { max-width: 500px; margin: 100px auto 50px; padding: 0 20px; }
+        #tips { text-align: center; color: var(--main); font-size: 13px; margin-bottom: 15px; min-height: 20px; }
+
+        .input-area { background: #fff; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); margin-bottom: 30px; }
+        textarea { width: 100%; height: 80px; border: 1px solid #eee; border-radius: 10px; padding: 10px; box-sizing: border-box; font-size: 16px; outline: none; resize: none; }
+        .btn-send { width: 100%; background: var(--main); color: white; border: none; padding: 12px; border-radius: 10px; margin-top: 10px; cursor: pointer; font-size: 16px; font-weight: bold; }
+
+        .card { background: #fff; padding: 20px; border-radius: 15px; margin-bottom: 15px; border-left: 5px solid var(--main); box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .time { font-size: 12px; color: #bbb; display: block; margin-bottom: 8px; }
+        .content { color: #444; font-size: 16px; line-height: 1.5; white-space: pre-wrap; word-break: break-all; }
         
-        .item { background: #fff; padding: 20px; border-radius: 15px; margin-top: 15px; border-left: 5px solid var(--main); box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
-        .time { font-size: 12px; color: #bbb; display: block; }
-        .txt { font-size: 16px; color: #444; margin-top: 10px; }
+        .btn-del { 
+            background: none; border: 1px solid #f0f0f0; color: #ccc; 
+            padding: 3px 10px; border-radius: 5px; cursor: pointer; font-size: 11px;
+            float: right; margin-top: 10px;
+        }
+        .btn-del:hover { color: var(--danger); border-color: var(--danger); }
+
+        #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.1); display: none; z-index: 1999; }
+        .refresh-btn { position: fixed; bottom: 30px; right: 20px; background: #fff; border: 1px solid var(--main); color: var(--main); width: 50px; height: 50px; border-radius: 25px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); font-size: 12px; }
     </style>
 </head>
 <body>
 
-    <header><b style="color:var(--main)">专为姐姐设计的网站！</b></header>
+    <header>
+        <div style="color: var(--main); font-weight: bold;">FOR SISTER</div>
+        <div class="menu-btn" onclick="toggleMenu()">
+            <span></span><span></span><span></span>
+        </div>
+    </header>
+
+    <div id="overlay" onclick="toggleMenu()"></div>
+
+    <div id="sidePanel">
+        <div class="info-section">
+            <span class="info-label">📢 公告</span>
+            <div class="info-content">欢迎来到姐姐的秘密基地！在这里记录的每一句话，都会永远保存在云端。愿姐姐天天开心！</div>
+        </div>
+        <div class="info-section">
+            <span class="info-label">👤 作者</span>
+            <div class="info-content">来自最支持你的家人</div>
+        </div>
+        <div class="info-section">
+            <span class="info-label">🔖 版本</span>
+            <div class="info-content">v1.0.3 (Cloud & Secure)</div>
+        </div>
+    </div>
 
     <div class="container">
-        <div id="status-board">正在连接云端，请稍候...</div>
+        <div id="tips">正在连接云端...</div>
 
-        <div class="input-box">
-            <textarea id="msgInp" placeholder="写下想对姐姐说的话..."></textarea>
-            <button class="btn" id="postBtn" onclick="doPublish()">同步发布</button>
+        <div class="input-area">
+            <textarea id="myMsg" placeholder="写下想对姐姐说的话..."></textarea>
+            <button class="btn-send" id="pubBtn" onclick="publish()">发布内容</button>
         </div>
 
         <div id="msgList"></div>
     </div>
 
+    <button class="refresh-btn" onclick="loadData()">刷新</button>
+
     <script>
-        // ======= 1. 请在这里填入你的 Master Key =======
-        const MASTER_KEY = "$2a$10$lq61umlvFUgmbzVZts9WY.4brTae7F8gCucq2L47zNSOKa4WRKODO"; 
-        
-        // ======= 2. 获取到ID后填在这里 =======
-        let BIN_ID = "699c4b22ae596e708f424292"; 
-        // ===========================================
+        // ================= 配置区 =================
+        const MY_KEY = "$2a$10$lq61umlvFUgmbzVZts9WY.4brTae7F8gCucq2L47zNSOKa4WRKODO"; 
+        const MY_ID = "699c4b22ae596e708f424292"; 
+        const ADMIN_PASSWORD = "作者是帅哥"; // 这里设置删除密码
+        // ==========================================
 
-        const board = document.getElementById('status-board');
-        const listEl = document.getElementById('msgList');
-
-        window.onload = async function() {
-            if (MASTER_KEY.length < 10 || MASTER_KEY.includes("$2a$10$lq61umlvFUgmbzVZts9WY.4brTae7F8gCucq2L47zNSOKa4WRKODO")) {
-                board.innerHTML = "💡 <b>第一步：</b><br>请先去 jsonbin.io 申请 Master Key 并填入代码第 48 行。";
-                return;
-            }
-
-            if (!BIN_ID || BIN_ID.length < 10) {
-                board.innerHTML = "⏳ 正在为您创建云端空间...";
-                autoCreateBin();
-            } else {
-                board.innerHTML = "✅ 云端已连接";
-                fetchData();
-            }
-        };
-
-        // 自动创建
-        async function autoCreateBin() {
-            try {
-                const res = await fetch("https://api.jsonbin.io/v3/b", {
-                    method: 'POST',
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-Master-Key": MASTER_KEY,
-                        "X-Bin-Private": "true"
-                    },
-                    body: JSON.stringify({ notes: [{ content: "云端空间创建成功！开始留言吧。", time: new Date().toLocaleString() }] })
-                });
-                const data = await res.json();
-                if (data.metadata && data.metadata.id) {
-                    const newId = data.metadata.id;
-                    board.innerHTML = `🎉 <b>空间创建成功！</b><br>请复制下方 ID 并填入代码第 51 行：<br><span class="id-highlight">${newId}</span><br>填好保存后，刷新网页即可开始同步。`;
-                }
-            } catch (e) {
-                board.innerHTML = "❌ 创建失败。请检查您的 Master Key 是否填错，或者网络是否开启。";
-            }
+        function toggleMenu() {
+            const panel = document.getElementById('sidePanel');
+            const overlay = document.getElementById('overlay');
+            const isOpen = panel.classList.toggle('open');
+            overlay.style.display = isOpen ? 'block' : 'none';
         }
 
-        // 获取数据
-        async function fetchData() {
+        async function loadData() {
+            if(MY_KEY.includes("$2a$10$lq61umlvFUgmbzVZts9WY.4brTae7F8gCucq2L47zNSOKa4WRKODO") || MY_ID.includes("这里")) {
+                document.getElementById('tips').innerText = "❌ 请先配置 Key 和 ID";
+                return;
+            }
+            document.getElementById('tips').innerText = "正在同步内容...";
             try {
-                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-                    headers: { "X-Master-Key": MASTER_KEY, "Cache-Control": "no-cache" }
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${MY_ID}/latest`, {
+                    headers: { "X-Master-Key": MY_KEY }
                 });
-                const result = await res.json();
-                render(result.record.notes || []);
+                const data = await res.json();
+                render(data.record.notes || []);
+                document.getElementById('tips').innerText = "✨ 云端同步已完成";
             } catch (e) {
-                board.innerHTML = "❌ 读取失败。请检查代码第 51 行的 BIN_ID 是否正确。";
+                document.getElementById('tips').innerText = "❌ 连接失败，请检查网络";
             }
         }
 
         function render(notes) {
-            listEl.innerHTML = '';
-            [...notes].reverse().forEach(n => {
+            const list = document.getElementById('msgList');
+            list.innerHTML = '';
+            // 倒序显示，最新在上面
+            [...notes].reverse().forEach((n, reverseIndex) => {
+                // 计算在原数组中的真实索引
+                const realIndex = notes.length - 1 - reverseIndex;
                 const div = document.createElement('div');
-                div.className = 'item';
-                div.innerHTML = `<span class="time">${n.time}</span><div class="txt">${n.content}</div>`;
-                listEl.appendChild(div);
+                div.className = 'card';
+                div.innerHTML = `
+                    <span class="time">${n.time}</span>
+                    <div class="content">${n.content}</div>
+                    <button class="btn-del" onclick="deleteNote(${realIndex})">删除</button>
+                    <div style="clear:both"></div>
+                `;
+                list.appendChild(div);
             });
         }
 
-        // 发布
-        async function doPublish() {
-            if (!BIN_ID) { alert("请先在代码中填入 BIN_ID！"); return; }
-            const inp = document.getElementById('msgInp');
-            const content = inp.value.trim();
-            if (!content) return;
-
-            document.getElementById('postBtn').disabled = true;
-            board.innerHTML = "正在同步到云端...";
+        async function publish() {
+            const txt = document.getElementById('myMsg').value.trim();
+            if(!txt) return;
+            const btn = document.getElementById('pubBtn');
+            btn.disabled = true;
 
             try {
-                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-                    headers: { "X-Master-Key": MASTER_KEY }
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${MY_ID}/latest`, {
+                    headers: { "X-Master-Key": MY_KEY }
                 });
-                const result = await res.json();
-                let notes = result.record.notes || [];
-                notes.push({ content: content, time: new Date().toLocaleString() });
-
-                await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                const data = await res.json();
+                let notes = data.record.notes || [];
+                notes.push({ content: txt, time: new Date().toLocaleString() });
+                
+                await fetch(`https://api.jsonbin.io/v3/b/${MY_ID}`, {
                     method: 'PUT',
-                    headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY },
+                    headers: { "Content-Type": "application/json", "X-Master-Key": MY_KEY },
                     body: JSON.stringify({ notes: notes })
                 });
 
-                inp.value = '';
-                board.innerHTML = "✅ 发布成功";
-                fetchData();
+                document.getElementById('myMsg').value = '';
+                loadData();
             } catch (e) {
                 alert("发布失败");
             } finally {
-                document.getElementById('postBtn').disabled = false;
+                btn.disabled = false;
             }
         }
+
+        async function deleteNote(index) {
+            const pw = prompt("请输入管理密码：");
+            if (pw === null) return;
+            if (pw !== ADMIN_PASSWORD) {
+                alert("密码错误！");
+                return;
+            }
+
+            document.getElementById('tips').innerText = "正在从云端移除...";
+            try {
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${MY_ID}/latest`, {
+                    headers: { "X-Master-Key": MY_KEY }
+                });
+                const data = await res.json();
+                let notes = data.record.notes || [];
+                notes.splice(index, 1);
+                
+                await fetch(`https://api.jsonbin.io/v3/b/${MY_ID}`, {
+                    method: 'PUT',
+                    headers: { "Content-Type": "application/json", "X-Master-Key": MY_KEY },
+                    body: JSON.stringify({ notes: notes })
+                });
+                loadData();
+            } catch (e) {
+                alert("删除失败");
+            }
+        }
+
+        window.onload = loadData;
     </script>
 </body>
 </html>
