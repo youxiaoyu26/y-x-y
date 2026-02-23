@@ -6,7 +6,7 @@
     <title>姐姐的私人动态空间</title>
     <style>
         :root { --main: #d4a373; --bg: #faf9f6; --danger: #ff4d4d; --white: #ffffff; }
-        body { background: var(--bg); font-family: 'PingFang SC', sans-serif; margin: 0; padding: 0; }
+        body { background: var(--bg); font-family: 'PingFang SC', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
         
         /* 导航栏 */
         header { 
@@ -15,9 +15,10 @@
             display: flex; justify-content: space-between; align-items: center; 
             padding: 0 20px; box-sizing: border-box; z-index: 1000; border-bottom: 1px solid #eee;
         }
+        .logo { color: var(--main); font-weight: bold; letter-spacing: 1px; }
 
-        /* 三条杠按钮 */
-        .menu-btn { cursor: pointer; border: none; background: none; display: flex; flex-direction: column; gap: 5px; z-index: 2001; }
+        /* 三条杠菜单按钮 */
+        .menu-btn { cursor: pointer; border: none; background: none; display: flex; flex-direction: column; gap: 5px; z-index: 2001; padding: 10px; }
         .menu-btn span { width: 25px; height: 2px; background: var(--main); border-radius: 2px; transition: 0.3s; }
 
         /* 侧边栏 */
@@ -29,36 +30,43 @@
         #sidePanel.open { right: 0; }
 
         .info-section { margin-bottom: 30px; }
-        .info-label { color: #999; font-size: 12px; letter-spacing: 1px; margin-bottom: 8px; display: block; }
+        .info-label { color: #999; font-size: 12px; letter-spacing: 1px; margin-bottom: 8px; display: block; border-bottom: 1px solid #f5f5f5; padding-bottom: 5px; }
         .info-content { color: #333; font-size: 14px; line-height: 1.6; }
 
-        /* 主体内容 */
-        .container { max-width: 500px; margin: 100px auto 50px; padding: 0 20px; }
+        /* 主体内容区 */
+        .container { max-width: 500px; margin: 90px auto 50px; padding: 0 20px; }
         #tips { text-align: center; color: var(--main); font-size: 13px; margin-bottom: 15px; min-height: 20px; }
 
-        .input-area { background: #fff; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); margin-bottom: 30px; }
-        textarea { width: 100%; height: 80px; border: 1px solid #eee; border-radius: 10px; padding: 10px; box-sizing: border-box; font-size: 16px; outline: none; resize: none; }
-        .btn-send { width: 100%; background: var(--main); color: white; border: none; padding: 12px; border-radius: 10px; margin-top: 10px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        .input-area { background: #fff; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); margin-bottom: 25px; }
+        textarea { width: 100%; height: 85px; border: 1px solid #eee; border-radius: 10px; padding: 12px; box-sizing: border-box; font-size: 16px; outline: none; resize: none; transition: 0.3s; }
+        textarea:focus { border-color: var(--main); }
+        .btn-send { width: 100%; background: var(--main); color: white; border: none; padding: 12px; border-radius: 10px; margin-top: 10px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.3s; }
+        .btn-send:active { transform: scale(0.98); opacity: 0.9; }
 
-        .card { background: #fff; padding: 20px; border-radius: 15px; margin-bottom: 15px; border-left: 5px solid var(--main); box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
-        .time { font-size: 12px; color: #bbb; display: block; margin-bottom: 8px; }
+        /* 动态卡片 */
+        .card { background: #fff; padding: 20px; border-radius: 15px; margin-bottom: 15px; border-left: 5px solid var(--main); box-shadow: 0 2px 5px rgba(0,0,0,0.02); position: relative; }
+        .time { font-size: 11px; color: #bbb; display: block; margin-bottom: 8px; }
         .content { color: #444; font-size: 16px; line-height: 1.5; white-space: pre-wrap; word-break: break-all; }
         
+        /* 删除按钮 */
         .btn-del { 
-            background: none; border: 1px solid #f0f0f0; color: #ccc; 
-            padding: 3px 10px; border-radius: 5px; cursor: pointer; font-size: 11px;
-            float: right; margin-top: 10px;
+            background: none; border: 1px solid #f5f5f5; color: #ddd; 
+            padding: 2px 10px; border-radius: 5px; cursor: pointer; font-size: 11px;
+            float: right; margin-top: 10px; transition: 0.3s;
         }
         .btn-del:hover { color: var(--danger); border-color: var(--danger); }
 
-        #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.1); display: none; z-index: 1999; }
-        .refresh-btn { position: fixed; bottom: 30px; right: 20px; background: #fff; border: 1px solid var(--main); color: var(--main); width: 50px; height: 50px; border-radius: 25px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); font-size: 12px; }
+        /* 遮罩层 */
+        #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.2); display: none; z-index: 1999; backdrop-filter: blur(2px); }
+        
+        /* 刷新按钮 */
+        .refresh-btn { position: fixed; bottom: 30px; right: 20px; background: #fff; border: 1px solid var(--main); color: var(--main); width: 50px; height: 50px; border-radius: 25px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); font-size: 12px; z-index: 100; }
     </style>
 </head>
 <body>
 
     <header>
-        <div style="color: var(--main); font-weight: bold;">FOR SISTER</div>
+        <div class="logo">FOR SISTER</div>
         <div class="menu-btn" onclick="toggleMenu()">
             <span></span><span></span><span></span>
         </div>
@@ -69,24 +77,24 @@
     <div id="sidePanel">
         <div class="info-section">
             <span class="info-label">📢 公告</span>
-            <div class="info-content">欢迎来到姐姐的秘密基地！在这里记录的每一句话，都会永远保存在云端。愿姐姐天天开心！</div>
+            <div class="info-content">欢迎来到姐姐的秘密基地！在这里记录的每一句话，都会永远保存在云端。愿姐姐天天开心，好梦常在！</div>
         </div>
         <div class="info-section">
-            <span class="info-label">👤 作者</span>
-            <div class="info-content">来自最支持你的家人</div>
+            <span class="info-label">👤 关于作者</span>
+            <div class="info-content">来自最支持你的家人<br>Gemini Collaborative Design</div>
         </div>
         <div class="info-section">
-            <span class="info-label">🔖 版本</span>
-            <div class="info-content">v1.0.3 (Cloud & Secure)</div>
+            <span class="info-label">🔖 版本信息</span>
+            <div class="info-content">v5.1.0 (Stable Cloud)</div>
         </div>
     </div>
 
     <div class="container">
-        <div id="tips">正在连接云端...</div>
+        <div id="tips">正在检查同步连接...</div>
 
         <div class="input-area">
             <textarea id="myMsg" placeholder="写下想对姐姐说的话..."></textarea>
-            <button class="btn-send" id="pubBtn" onclick="publish()">发布内容</button>
+            <button class="btn-send" id="pubBtn" onclick="publish()">同步发布</button>
         </div>
 
         <div id="msgList"></div>
@@ -98,7 +106,7 @@
         // ================= 配置区 =================
         const MY_KEY = "$2a$10$lq61umlvFUgmbzVZts9WY.4brTae7F8gCucq2L47zNSOKa4WRKODO"; 
         const MY_ID = "699c4b22ae596e708f424292"; 
-        const ADMIN_PASSWORD = "作者是帅哥"; // 这里设置删除密码
+        const ADMIN_PASSWORD = "123"; // 设置你的删除密码
         // ==========================================
 
         function toggleMenu() {
@@ -109,18 +117,18 @@
         }
 
         async function loadData() {
-            if(MY_KEY.includes("$2a$10$lq61umlvFUgmbzVZts9WY.4brTae7F8gCucq2L47zNSOKa4WRKODO") || MY_ID.includes("这里")) {
+            if(MY_KEY.includes("$2a$10$lq61umlvFUgmbzVZts9WY.4brTae7F8gCucq2L47zNSOKa4WRKODO") || MY_ID.includes("699c4b22ae596e708f424292")) {
                 document.getElementById('tips').innerText = "❌ 请先配置 Key 和 ID";
                 return;
             }
-            document.getElementById('tips').innerText = "正在同步内容...";
+            document.getElementById('tips').innerText = "正在从云端获取最新动态...";
             try {
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${MY_ID}/latest`, {
-                    headers: { "X-Master-Key": MY_KEY }
+                    headers: { "X-Master-Key": MY_KEY, "Cache-Control": "no-cache" }
                 });
                 const data = await res.json();
                 render(data.record.notes || []);
-                document.getElementById('tips').innerText = "✨ 云端同步已完成";
+                document.getElementById('tips').innerText = "✨ 云端数据同步完成";
             } catch (e) {
                 document.getElementById('tips').innerText = "❌ 连接失败，请检查网络";
             }
@@ -129,9 +137,8 @@
         function render(notes) {
             const list = document.getElementById('msgList');
             list.innerHTML = '';
-            // 倒序显示，最新在上面
+            // 倒序：最新的在最上面。realIndex 确保删除时对应原数组位置
             [...notes].reverse().forEach((n, reverseIndex) => {
-                // 计算在原数组中的真实索引
                 const realIndex = notes.length - 1 - reverseIndex;
                 const div = document.createElement('div');
                 div.className = 'card';
@@ -150,6 +157,7 @@
             if(!txt) return;
             const btn = document.getElementById('pubBtn');
             btn.disabled = true;
+            document.getElementById('tips').innerText = "正在上传到云端...";
 
             try {
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${MY_ID}/latest`, {
@@ -168,21 +176,21 @@
                 document.getElementById('myMsg').value = '';
                 loadData();
             } catch (e) {
-                alert("发布失败");
+                alert("发布失败，请刷新页面重试");
             } finally {
                 btn.disabled = false;
             }
         }
 
         async function deleteNote(index) {
-            const pw = prompt("请输入管理密码：");
+            const pw = prompt("请输入管理密码确认删除：");
             if (pw === null) return;
             if (pw !== ADMIN_PASSWORD) {
-                alert("密码错误！");
+                alert("密码错误，无法删除动态");
                 return;
             }
 
-            document.getElementById('tips').innerText = "正在从云端移除...";
+            document.getElementById('tips').innerText = "正在销毁云端数据...";
             try {
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${MY_ID}/latest`, {
                     headers: { "X-Master-Key": MY_KEY }
