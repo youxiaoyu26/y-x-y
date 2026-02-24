@@ -214,7 +214,7 @@
             cursor: pointer;
         }
 
-        /* 动态卡片 - 增加动态删除按钮和可点击用户名 */
+        /* 动态卡片 - 永久显示身份标签 */
         .card { 
             background: rgba(255,255,255,0.9); 
             padding: 12px 15px; 
@@ -233,6 +233,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            flex-wrap: wrap;
         }
         .author-name { 
             font-size: 11.5px; 
@@ -253,6 +254,8 @@
             padding: 2px 6px;
             border-radius: 12px;
             margin-left: 4px;
+            display: inline-block;
+            font-weight: normal;
         }
         .post-time { 
             font-size: 9px; 
@@ -315,7 +318,7 @@
             box-sizing: border-box;
         }
 
-        /* 评论区域 - 删除按钮样式和可点击用户名 */
+        /* 评论区域 - 永久显示身份标签 */
         .comment-item {
             background: rgba(0,0,0,0.02);
             padding: 8px 10px;
@@ -328,6 +331,10 @@
         }
         .comment-content {
             flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-wrap: wrap;
         }
         .comment-author {
             color: var(--main);
@@ -834,7 +841,7 @@
         <div class="owner-section">
             <div class="owner-label">👑 网站拥有者</div>
             <div class="owner-name">
-                饭饭 <span class="owner-badge">创始人/柚小屿</span>
+               饭饭 <span class="owner-badge">创始人/柚小屿</span>
             </div>
             <div style="font-size: 11px; color: #666; margin-top: 5px;">✨ 记录生活，分享美好</div>
         </div>
@@ -904,12 +911,12 @@
             </div>
         </div>
 
-        <!-- 新增：用户身份管理 -->
+        <!-- 用户身份管理 - 永久保存在云端 -->
         <div class="identity-manager">
             <div class="identity-header" onclick="toggleIdentityList()">
                 <div class="identity-header-left">
                     <span class="identity-icon">👥</span>
-                    <span class="identity-title">用户身份管理</span>
+                    <span class="identity-title">用户身份管理（永久保存）</span>
                     <span class="identity-count" id="userCount">0</span>
                 </div>
                 <span class="identity-arrow" id="identityArrow">▶</span>
@@ -1016,7 +1023,7 @@
                 shape: "circle"
             },
             adminMode: false,
-            userBadges: {} // 存储用户身份标签
+            userBadges: {} // 永久存储用户身份标签
         };
         let currentUser = localStorage.getItem('sister_user') || null;
         let currentSignature = "✨ 这个人很懒，还没有签名~";
@@ -1025,7 +1032,7 @@
         let effectSettings = { color: "#d4a373", size: 30, shape: "circle" };
         let particles = [];
         let adminMode = false;
-        let userBadges = {}; // { username: "身份标签" }
+        let userBadges = {}; // { username: "身份标签" } - 永久保存在云端
 
         // 切换用户身份列表显示
         function toggleIdentityList() {
@@ -1069,7 +1076,7 @@
                         </div>
                         <div class="identity-badge-edit">
                             <input type="text" class="identity-badge-input" id="badge-${user.username}" value="${badge}" placeholder="身份">
-                            <button class="identity-save-btn" onclick="saveUserBadge('${user.username}')">保存</button>
+                            <button class="identity-save-btn" onclick="saveUserBadge('${user.username}')">永久保存</button>
                         </div>
                     </div>
                 `;
@@ -1078,22 +1085,49 @@
             list.innerHTML = html;
         }
 
-        // 保存用户身份标签
+        // 保存用户身份标签 - 永久保存到云端
         async function saveUserBadge(username) {
             const input = document.getElementById(`badge-${username}`);
             const newBadge = input.value.trim() || '普通用户';
             
+            // 更新本地数据
             userBadges[username] = newBadge;
             
-            // 立即更新显示
-            showAuthError(`✅ 已将 ${username} 的身份改为 "${newBadge}"`);
-            setTimeout(hideAuthError, 2000);
-            
-            // 重新渲染动态以更新身份标签显示
-            await loadData();
+            try {
+                // 获取当前云端数据
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.BIN}/latest`, { 
+                    headers: { "X-Master-Key": CONFIG.KEY }
+                });
+                const data = await res.json();
+                
+                // 更新 userBadges
+                const updatedBadges = {
+                    ...(data.record.userBadges || {}),
+                    [username]: newBadge
+                };
+                
+                // 保存到云端
+                const updatedRecord = {
+                    ...data.record,
+                    userBadges: updatedBadges
+                };
+                
+                await updateCloud(updatedRecord);
+                
+                // 显示成功提示
+                showAuthError(`✅ 已将 ${username} 的身份永久改为 "${newBadge}"，所有人可见`);
+                setTimeout(hideAuthError, 3000);
+                
+                // 重新渲染用户列表和动态
+                await loadData();
+                
+            } catch (e) {
+                showAuthError("❌ 保存失败，请重试");
+                setTimeout(hideAuthError, 2000);
+            }
         }
 
-        // 获取用户身份标签
+        // 获取用户身份标签 - 永久显示
         function getUserBadge(username) {
             return userBadges[username] || '普通用户';
         }
@@ -1404,7 +1438,7 @@
                 createdAt: new Date().toISOString()
             });
             
-            // 为新用户设置默认身份
+            // 为新用户设置默认身份（永久保存）
             userBadges[n] = '普通用户';
             
             const success = await saveUsers(users);
@@ -1504,7 +1538,7 @@
                     }
                 }
                 
-                // 加载用户身份标签
+                // 加载用户身份标签（永久保存）
                 if (d.record.userBadges) {
                     userBadges = d.record.userBadges;
                 }
@@ -1819,7 +1853,7 @@
                 signature: signatureData, 
                 users: users,
                 adminMode: adminModeState,
-                userBadges: userBadges
+                userBadges: userBadges // 永久保存用户身份标签
             }); 
             closeAll();
         }
@@ -1841,7 +1875,7 @@
                     signature: signatureData, 
                     users: users,
                     adminMode: false,
-                    userBadges: {}
+                    userBadges: {} // 重置身份标签
                 }); 
                 closeAll(); 
             } 
