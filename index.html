@@ -214,7 +214,7 @@
             cursor: pointer;
         }
 
-        /* 动态卡片 - 增加动态删除按钮 */
+        /* 动态卡片 - 增加动态删除按钮和可点击用户名 */
         .card { 
             background: rgba(255,255,255,0.9); 
             padding: 12px 15px; 
@@ -238,6 +238,21 @@
             font-size: 11.5px; 
             color: var(--main); 
             font-weight: bold; 
+            cursor: pointer;
+            padding: 2px 4px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .author-name:hover {
+            background: rgba(212, 163, 115, 0.1);
+        }
+        .user-badge-display {
+            background: var(--main);
+            color: white;
+            font-size: 8px;
+            padding: 2px 6px;
+            border-radius: 12px;
+            margin-left: 4px;
         }
         .post-time { 
             font-size: 9px; 
@@ -300,7 +315,7 @@
             box-sizing: border-box;
         }
 
-        /* 评论区域 - 删除按钮样式 */
+        /* 评论区域 - 删除按钮样式和可点击用户名 */
         .comment-item {
             background: rgba(0,0,0,0.02);
             padding: 8px 10px;
@@ -313,6 +328,17 @@
         }
         .comment-content {
             flex: 1;
+        }
+        .comment-author {
+            color: var(--main);
+            font-weight: bold;
+            cursor: pointer;
+            padding: 0 2px;
+            border-radius: 3px;
+            transition: background 0.2s;
+        }
+        .comment-author:hover {
+            background: rgba(212, 163, 115, 0.1);
         }
         .comment-actions {
             display: flex;
@@ -367,7 +393,252 @@
             text-align: center;
         }
 
-        /* 开发者模式 - 点击特效设置和管理员模式 */
+        /* 用户信息弹窗样式 */
+        .user-profile-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            backdrop-filter: blur(4px);
+        }
+        .user-profile-card {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            width: 280px;
+            max-width: 90%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        .user-profile-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            background: var(--main);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .user-title {
+            flex: 1;
+        }
+        .user-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        .user-badge {
+            display: inline-block;
+            background: var(--main);
+            color: white;
+            font-size: 9px;
+            padding: 2px 8px;
+            border-radius: 20px;
+        }
+        .user-signature {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #555;
+            line-height: 1.5;
+            border-left: 3px solid var(--main);
+        }
+        .user-signature-label {
+            font-size: 10px;
+            color: #999;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        .user-stats {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .user-stat {
+            flex: 1;
+            text-align: center;
+            background: #f5f5f5;
+            padding: 8px;
+            border-radius: 10px;
+        }
+        .user-stat-value {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--main);
+        }
+        .user-stat-label {
+            font-size: 9px;
+            color: #999;
+            margin-top: 2px;
+        }
+        .close-profile-btn {
+            width: 100%;
+            padding: 10px;
+            background: var(--main);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .close-profile-btn:hover {
+            opacity: 0.9;
+            transform: scale(0.98);
+        }
+
+        /* 开发者模式 - 用户身份管理样式 */
+        .identity-manager {
+            background: #e8f4f8;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        .identity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+        .identity-header:hover {
+            background: rgba(0,0,0,0.05);
+        }
+        .identity-header-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .identity-icon {
+            font-size: 14px;
+        }
+        .identity-title {
+            font-size: 11px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .identity-count {
+            background: var(--main);
+            color: white;
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 12px;
+        }
+        .identity-arrow {
+            font-size: 12px;
+            color: #666;
+            transition: transform 0.3s;
+        }
+        .identity-arrow.expanded {
+            transform: rotate(90deg);
+        }
+        .identity-list {
+            margin-top: 10px;
+            display: none;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .identity-list.expanded {
+            display: block;
+        }
+        .identity-item {
+            background: white;
+            padding: 8px 10px;
+            border-radius: 6px;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 2px solid var(--main);
+        }
+        .identity-user {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .identity-user-avatar {
+            width: 24px;
+            height: 24px;
+            background: var(--main);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .identity-user-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .identity-username {
+            font-size: 11px;
+            font-weight: bold;
+            color: #333;
+        }
+        .identity-userdate {
+            font-size: 8px;
+            color: #999;
+        }
+        .identity-badge-edit {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .identity-badge-input {
+            width: 70px;
+            padding: 4px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 10px;
+        }
+        .identity-save-btn {
+            background: var(--main);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 3px 8px;
+            font-size: 9px;
+            cursor: pointer;
+        }
+        .identity-save-btn:hover {
+            opacity: 0.9;
+        }
+
         .effect-preview {
             width: 100%;
             height: 50px;
@@ -539,6 +810,9 @@
     <!-- 删除确认弹窗容器 - 动态生成 -->
     <div id="deleteConfirmContainer"></div>
 
+    <!-- 用户信息弹窗容器 -->
+    <div id="userProfileContainer"></div>
+
     <header>
         <div class="logo">姐姐的个人空间</div>
         <button class="menu-btn" onclick="toggleMenu()"><span></span><span></span><span></span></button>
@@ -560,7 +834,7 @@
         <div class="owner-section">
             <div class="owner-label">👑 网站拥有者</div>
             <div class="owner-name">
-                麦麦 <span class="owner-badge">创始人</span>
+                饭饭 <span class="owner-badge">创始人/柚小屿</span>
             </div>
             <div style="font-size: 11px; color: #666; margin-top: 5px;">✨ 记录生活，分享美好</div>
         </div>
@@ -612,7 +886,7 @@
     <div id="devModal">
         <h3 style="margin:0 0 15px; text-align:center; font-size:16px">🛠️ 开发者配置</h3>
         
-        <!-- 新增：管理员模式开关 -->
+        <!-- 管理员模式开关 -->
         <div style="background:#ffe0e0; padding:10px; border-radius:10px; margin-bottom:15px">
             <label style="font-size:11px; font-weight:bold">👑 管理员模式</label>
             <div class="admin-mode-switch">
@@ -627,6 +901,21 @@
             </div>
             <div style="font-size:10px; color:#666; margin-top:5px; padding:0 5px;">
                 开启后可以删除任意用户的动态和评论
+            </div>
+        </div>
+
+        <!-- 新增：用户身份管理 -->
+        <div class="identity-manager">
+            <div class="identity-header" onclick="toggleIdentityList()">
+                <div class="identity-header-left">
+                    <span class="identity-icon">👥</span>
+                    <span class="identity-title">用户身份管理</span>
+                    <span class="identity-count" id="userCount">0</span>
+                </div>
+                <span class="identity-arrow" id="identityArrow">▶</span>
+            </div>
+            <div class="identity-list" id="identityList">
+                <!-- 用户列表会动态生成 -->
             </div>
         </div>
 
@@ -726,7 +1015,8 @@
                 size: 30,
                 shape: "circle"
             },
-            adminMode: false  // 新增：管理员模式默认关闭
+            adminMode: false,
+            userBadges: {} // 存储用户身份标签
         };
         let currentUser = localStorage.getItem('sister_user') || null;
         let currentSignature = "✨ 这个人很懒，还没有签名~";
@@ -734,7 +1024,155 @@
         let users = [];
         let effectSettings = { color: "#d4a373", size: 30, shape: "circle" };
         let particles = [];
-        let adminMode = false; // 管理员模式状态
+        let adminMode = false;
+        let userBadges = {}; // { username: "身份标签" }
+
+        // 切换用户身份列表显示
+        function toggleIdentityList() {
+            const list = document.getElementById('identityList');
+            const arrow = document.getElementById('identityArrow');
+            list.classList.toggle('expanded');
+            arrow.classList.toggle('expanded');
+            
+            // 展开时刷新用户列表
+            if (list.classList.contains('expanded')) {
+                renderUserList();
+            }
+        }
+
+        // 渲染用户列表
+        function renderUserList() {
+            const list = document.getElementById('identityList');
+            const userCount = document.getElementById('userCount');
+            
+            if (!users || users.length === 0) {
+                list.innerHTML = '<div style="text-align:center; padding:10px; color:#999">暂无用户</div>';
+                userCount.innerText = '0';
+                return;
+            }
+            
+            userCount.innerText = users.length;
+            
+            let html = '';
+            users.forEach(user => {
+                const badge = userBadges[user.username] || '普通用户';
+                const createdDate = user.createdAt ? new Date(user.createdAt).toLocaleDateString() : '未知';
+                
+                html += `
+                    <div class="identity-item">
+                        <div class="identity-user">
+                            <div class="identity-user-avatar">${user.username.charAt(0).toUpperCase()}</div>
+                            <div class="identity-user-info">
+                                <span class="identity-username">${user.username}</span>
+                                <span class="identity-userdate">注册: ${createdDate}</span>
+                            </div>
+                        </div>
+                        <div class="identity-badge-edit">
+                            <input type="text" class="identity-badge-input" id="badge-${user.username}" value="${badge}" placeholder="身份">
+                            <button class="identity-save-btn" onclick="saveUserBadge('${user.username}')">保存</button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            list.innerHTML = html;
+        }
+
+        // 保存用户身份标签
+        async function saveUserBadge(username) {
+            const input = document.getElementById(`badge-${username}`);
+            const newBadge = input.value.trim() || '普通用户';
+            
+            userBadges[username] = newBadge;
+            
+            // 立即更新显示
+            showAuthError(`✅ 已将 ${username} 的身份改为 "${newBadge}"`);
+            setTimeout(hideAuthError, 2000);
+            
+            // 重新渲染动态以更新身份标签显示
+            await loadData();
+        }
+
+        // 获取用户身份标签
+        function getUserBadge(username) {
+            return userBadges[username] || '普通用户';
+        }
+
+        // 显示用户信息弹窗
+        function showUserProfile(username) {
+            let userSignature = "这个人还没有设置签名~";
+            
+            if (window.signatureData && window.signatureData.owner === username) {
+                userSignature = window.signatureData.content;
+            } else if (signatureOwner === username) {
+                userSignature = currentSignature;
+            }
+            
+            const badge = getUserBadge(username);
+            
+            const container = document.getElementById('userProfileContainer');
+            container.innerHTML = `
+                <div class="user-profile-overlay" onclick="if(event.target===this) this.remove()">
+                    <div class="user-profile-card">
+                        <div class="user-profile-header">
+                            <div class="user-avatar">${username.charAt(0).toUpperCase()}</div>
+                            <div class="user-title">
+                                <div class="user-name">${username}</div>
+                                <span class="user-badge">${badge}</span>
+                            </div>
+                        </div>
+                        <div class="user-signature">
+                            <div class="user-signature-label">📝 个性签名</div>
+                            <div>${userSignature}</div>
+                        </div>
+                        <div class="user-stats">
+                            <div class="user-stat">
+                                <div class="user-stat-value" id="userPostCount">...</div>
+                                <div class="user-stat-label">动态</div>
+                            </div>
+                            <div class="user-stat">
+                                <div class="user-stat-value" id="userCommentCount">...</div>
+                                <div class="user-stat-label">评论</div>
+                            </div>
+                        </div>
+                        <button class="close-profile-btn" onclick="this.closest('.user-profile-overlay').remove()">关闭</button>
+                    </div>
+                </div>
+            `;
+            
+            loadUserStats(username).then(stats => {
+                const postCountEl = document.getElementById('userPostCount');
+                const commentCountEl = document.getElementById('userCommentCount');
+                if (postCountEl) postCountEl.innerText = stats.posts;
+                if (commentCountEl) commentCountEl.innerText = stats.comments;
+            });
+        }
+
+        // 加载用户统计信息
+        async function loadUserStats(username) {
+            try {
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.BIN}/latest?v=${Date.now()}`, { 
+                    headers: { "X-Master-Key": CONFIG.KEY }
+                });
+                const d = await res.json();
+                const notes = d.record.notes || [];
+                
+                let postCount = 0;
+                let commentCount = 0;
+                
+                notes.forEach(note => {
+                    if (note.author === username) postCount++;
+                    (note.comments || []).forEach(comment => {
+                        if (comment.user === username) commentCount++;
+                    });
+                });
+                
+                return { posts: postCount, comments: commentCount };
+            } catch (e) {
+                console.error('加载用户统计失败', e);
+                return { posts: 0, comments: 0 };
+            }
+        }
 
         // 切换管理员模式
         function toggleAdminMode() {
@@ -744,7 +1182,6 @@
             badge.innerText = adminMode ? '开启' : '关闭';
             badge.style.background = adminMode ? '#ff4d4d' : '#999';
             
-            // 重新渲染以更新删除按钮
             loadData();
         }
 
@@ -823,12 +1260,10 @@
             window.addEventListener('resize', resizeCanvas);
 
             document.addEventListener('click', (e) => {
-                // 如果点击的是开发者模式相关元素，不产生特效
                 if (e.target.closest('#devModal') || e.target.closest('#sidePanel') || e.target.closest('.btn')) {
                     return;
                 }
                 
-                // 每次点击产生5-8个粒子
                 const particleCount = 5 + Math.floor(Math.random() * 4);
                 for (let i = 0; i < particleCount; i++) {
                     particles.push(new Particle(
@@ -850,18 +1285,14 @@
             animate();
         }
 
-        // 选择特效形状
         function selectShape(shape) {
             document.querySelectorAll('.shape-option').forEach(opt => {
                 opt.classList.remove('selected');
             });
             event.target.classList.add('selected');
-            
-            // 更新预览
             updatePreview();
         }
 
-        // 更新预览
         function updatePreview() {
             const color = document.getElementById('effectColor').value;
             const size = document.getElementById('effectSize').value;
@@ -894,7 +1325,6 @@
             }
         }
 
-        // 显示错误信息
         function showAuthError(message) {
             const errorDiv = document.getElementById('authError');
             errorDiv.style.display = 'block';
@@ -973,6 +1403,9 @@
                 password: p,
                 createdAt: new Date().toISOString()
             });
+            
+            // 为新用户设置默认身份
+            userBadges[n] = '普通用户';
             
             const success = await saveUsers(users);
             
@@ -1054,14 +1487,12 @@
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.BIN}/latest?v=${Date.now()}`, { headers: { "X-Master-Key": CONFIG.KEY }});
                 const d = await res.json(); 
                 
-                // 应用特效设置
                 if (d.record.effect) {
                     effectSettings = d.record.effect;
                     document.documentElement.style.setProperty('--effect-color', effectSettings.color);
                     document.documentElement.style.setProperty('--effect-size', effectSettings.size + 'px');
                 }
                 
-                // 加载管理员模式状态
                 if (d.record.adminMode !== undefined) {
                     adminMode = d.record.adminMode;
                     const toggle = document.getElementById('adminModeToggle');
@@ -1073,14 +1504,13 @@
                     }
                 }
                 
-                applyStyles(d.record.settings); 
-                render(d.record.notes || []);
-                
-                if (d.record.users) {
-                    users = d.record.users;
+                // 加载用户身份标签
+                if (d.record.userBadges) {
+                    userBadges = d.record.userBadges;
                 }
                 
                 if (d.record.signature) {
+                    window.signatureData = d.record.signature;
                     if (typeof d.record.signature === 'object') {
                         currentSignature = d.record.signature.content || "✨ 这个人很懒，还没有签名~";
                         signatureOwner = d.record.signature.owner || null;
@@ -1091,6 +1521,16 @@
                 } else {
                     currentSignature = "✨ 这个人很懒，还没有签名~";
                     signatureOwner = null;
+                }
+                
+                applyStyles(d.record.settings); 
+                render(d.record.notes || []);
+                
+                if (d.record.users) {
+                    users = d.record.users;
+                    // 更新用户数量显示
+                    const userCount = document.getElementById('userCount');
+                    if (userCount) userCount.innerText = users.length;
                 }
                 
                 document.getElementById('signatureDisplay').innerText = currentSignature;
@@ -1114,7 +1554,6 @@
             document.getElementById('historyBox').innerHTML = (s.history || []).reverse().map(h => `<div style="font-size:11px; margin-bottom:5px; color:#666"><b>${h.ver}</b>: ${h.text}</div>`).join('');
         }
 
-        // 删除动态
         async function deletePost(noteIdx) {
             if (!currentUser) {
                 showAuthError("请先登录");
@@ -1128,7 +1567,6 @@
                 const data = await res.json();
                 let notes = data.record.notes || [];
                 
-                // 检查动态是否存在
                 if (!notes[noteIdx]) {
                     showAuthError("动态不存在");
                     return;
@@ -1136,13 +1574,11 @@
                 
                 const post = notes[noteIdx];
                 
-                // 管理员模式或作者本人可以删除
                 if (!adminMode && post.author !== currentUser) {
                     showAuthError("只能删除自己的动态");
                     return;
                 }
                 
-                // 删除动态
                 notes.splice(noteIdx, 1);
                 
                 await updateCloud({ ...data.record, notes });
@@ -1158,18 +1594,18 @@
             [...notes].map((n, i) => ({...n, rIdx: i})).reverse().forEach(note => {
                 const div = document.createElement('div'); div.className = 'card';
                 
-                // 检查是否可以删除动态（管理员模式 或 自己是作者）
                 const canDeletePost = currentUser && (adminMode || note.author === currentUser);
+                const authorBadge = getUserBadge(note.author);
                 
-                // 构建评论列表
                 const comms = (note.comments || []).map((c, ci) => {
-                    // 检查是否可以删除评论（管理员模式 或 自己是评论作者）
                     const canDeleteComment = currentUser && (adminMode || c.user === currentUser);
+                    const commenterBadge = getUserBadge(c.user);
                     
                     return `
                         <div class="comment-item">
                             <div class="comment-content">
-                                <b>${c.user}:</b> ${c.content}
+                                <span class="comment-author" onclick="showUserProfile('${c.user}')">${c.user}</span>
+                                ${commenterBadge !== '普通用户' ? `<span class="user-badge-display">${commenterBadge}</span>` : ''}: ${c.content}
                             </div>
                             <div class="comment-actions">
                                 <span class="comment-like" onclick="handleLike(${note.rIdx}, ${ci})">👍 ${c.likes || 0}</span>
@@ -1182,7 +1618,8 @@
                 div.innerHTML = `
                     <div class="card-header">
                         <div class="card-header-left">
-                            <span class="author-name">👤 ${note.author}</span>
+                            <span class="author-name" onclick="showUserProfile('${note.author}')">👤 ${note.author}</span>
+                            ${authorBadge !== '普通用户' ? `<span class="user-badge-display">${authorBadge}</span>` : ''}
                             <span class="post-time">${note.time}</span>
                         </div>
                         ${canDeletePost ? `<span class="post-delete-btn" onclick="showDeleteConfirm('确定要删除这条动态吗？', 'deletePost(${note.rIdx})')" title="删除动态">🗑️</span>` : ''}
@@ -1204,7 +1641,6 @@
             });
         }
 
-        // 删除评论函数
         async function deleteComment(noteIdx, commentIdx) {
             if (!currentUser) {
                 showAuthError("请先登录");
@@ -1218,7 +1654,6 @@
                 const data = await res.json();
                 let notes = data.record.notes || [];
                 
-                // 检查评论是否存在
                 if (!notes[noteIdx] || !notes[noteIdx].comments || !notes[noteIdx].comments[commentIdx]) {
                     showAuthError("评论不存在");
                     return;
@@ -1226,13 +1661,11 @@
                 
                 const comment = notes[noteIdx].comments[commentIdx];
                 
-                // 管理员模式或评论作者本人可以删除
                 if (!adminMode && comment.user !== currentUser) {
                     showAuthError("只能删除自己的评论");
                     return;
                 }
                 
-                // 删除评论
                 notes[noteIdx].comments.splice(commentIdx, 1);
                 
                 await updateCloud({ ...data.record, notes });
@@ -1353,7 +1786,6 @@
             const v = document.getElementById('devVer').value; const n = document.getElementById('devNotice').value;
             if(v && n && v !== s.currentVer) { s.history.push({ ver: s.currentVer, text: s.notice }); s.currentVer = v; s.notice = n; }
             
-            // 获取特效设置
             const effectColor = document.getElementById('effectColor').value;
             const effectSize = parseInt(document.getElementById('effectSize').value);
             const effectShape = document.querySelector('.shape-option.selected')?.dataset.shape || 'circle';
@@ -1378,7 +1810,6 @@
                 updatedAt: new Date().toISOString()
             } : null;
             
-            // 保存管理员模式状态
             const adminModeState = document.getElementById('adminModeToggle').checked;
             
             await updateCloud({ 
@@ -1387,7 +1818,8 @@
                 effect: effectSettings,
                 signature: signatureData, 
                 users: users,
-                adminMode: adminModeState
+                adminMode: adminModeState,
+                userBadges: userBadges
             }); 
             closeAll();
         }
@@ -1408,7 +1840,8 @@
                     effect: DEFAULT_S.effect,
                     signature: signatureData, 
                     users: users,
-                    adminMode: false
+                    adminMode: false,
+                    userBadges: {}
                 }); 
                 closeAll(); 
             } 
@@ -1419,12 +1852,10 @@
         function showDevAuth() { document.getElementById('devAuthArea').style.display='block'; }
         function verifyDevPass() { 
             if(document.getElementById('devPassInput').value === CONFIG.DEV_PASS) { 
-                // 加载当前特效设置到开发者面板
                 document.getElementById('effectColor').value = effectSettings.color;
                 document.getElementById('effectSize').value = effectSettings.size;
                 document.getElementById('effectSizeVal').innerText = effectSettings.size + 'px';
                 
-                // 设置形状选中状态
                 document.querySelectorAll('.shape-option').forEach(opt => {
                     if (opt.dataset.shape === effectSettings.shape) {
                         opt.classList.add('selected');
@@ -1433,12 +1864,14 @@
                     }
                 });
                 
-                // 设置管理员模式开关状态
                 const toggle = document.getElementById('adminModeToggle');
                 toggle.checked = adminMode;
                 const badge = document.getElementById('adminModeBadge');
                 badge.innerText = adminMode ? '开启' : '关闭';
                 badge.style.background = adminMode ? '#ff4d4d' : '#999';
+                
+                // 刷新用户列表
+                renderUserList();
                 
                 updatePreview();
                 document.getElementById('devModal').style.display = 'block'; 
@@ -1452,7 +1885,6 @@
             updateUserUI(); 
             updateSignatureOwner();
             hideAuthError();
-            // 重新渲染以更新删除按钮状态
             loadData();
         }
         function updateUserUI() { 
@@ -1467,7 +1899,6 @@
             }
         }
         
-        // 初始化事件监听
         document.getElementById('radiusRange').oninput = function() { 
             document.getElementById('radiusVal').innerText = this.value + 'px'; 
         }
@@ -1481,7 +1912,6 @@
             updatePreview();
         }
 
-        // 页面加载
         window.onload = function() {
             loadData();
             updateSignatureOwner();
