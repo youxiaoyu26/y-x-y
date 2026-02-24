@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>姐姐的个人空间</title>
+    <title>姐姐的个人空间/貌似是最终版</title>
     <style id="dynamicStyle">
         :root { 
             --main: #d4a373; 
@@ -525,7 +525,7 @@
             transform: scale(0.98);
         }
 
-        /* 开发者模式 - 用户身份管理样式 */
+        /* 开发者模式 - 用户身份管理和审核功能 */
         .identity-manager {
             background: #e8f4f8;
             padding: 10px;
@@ -621,6 +621,18 @@
             font-size: 8px;
             color: #999;
         }
+        .identity-status {
+            font-size: 8px;
+            padding: 2px 4px;
+            border-radius: 10px;
+            background: #ffd700;
+            color: #333;
+            margin-left: 5px;
+        }
+        .identity-status.approved {
+            background: #4caf50;
+            color: white;
+        }
         .identity-badge-edit {
             display: flex;
             align-items: center;
@@ -644,6 +656,41 @@
         }
         .identity-save-btn:hover {
             opacity: 0.9;
+        }
+        .identity-approve-btn {
+            background: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 3px 8px;
+            font-size: 9px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+        .identity-delete-btn {
+            background: #f44336;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 3px 8px;
+            font-size: 9px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+
+        /* 审核开关样式 */
+        .review-switch {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f0f0f0;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-top: 8px;
+        }
+        .review-switch .mode-toggle {
+            width: 44px;
+            height: 22px;
         }
 
         .effect-preview {
@@ -690,8 +737,8 @@
             color: white;
         }
 
-        /* 管理员模式开关样式 */
-        .admin-mode-switch {
+        /* 开关样式 */
+        .mode-switch {
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -700,18 +747,18 @@
             border-radius: 8px;
             margin-top: 8px;
         }
-        .admin-mode-label {
+        .mode-label {
             font-size: 11px;
             font-weight: bold;
             color: #333;
         }
-        .admin-mode-toggle {
+        .mode-toggle {
             position: relative;
             display: inline-block;
             width: 44px;
             height: 22px;
         }
-        .admin-mode-toggle input {
+        .mode-toggle input {
             opacity: 0;
             width: 0;
             height: 0;
@@ -744,8 +791,8 @@
         input:checked + .toggle-slider:before {
             transform: translateX(22px);
         }
-        .admin-badge {
-            background: #ff4d4d;
+        .status-badge {
+            background: #ff9800;
             color: white;
             font-size: 9px;
             padding: 2px 6px;
@@ -760,8 +807,8 @@
         @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .card, .input-card, .btn, .notice-box { border-radius: var(--radius) !important; }
 
-        /* 删除确认弹窗样式 */
-        .delete-confirm-overlay {
+        /* 通用弹窗样式 - 所有弹窗都直接写进页面 */
+        .custom-modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
@@ -772,40 +819,71 @@
             align-items: center;
             justify-content: center;
             z-index: 10000;
+            backdrop-filter: blur(4px);
         }
-        .delete-confirm-box {
+        .custom-modal {
             background: white;
             padding: 20px;
-            border-radius: 12px;
-            width: 260px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border-radius: 16px;
+            width: 300px;
+            max-width: 90%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            animation: modalSlideIn 0.3s ease;
         }
-        .delete-confirm-box p {
-            margin: 0 0 20px 0;
-            font-size: 14px;
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        .modal-title {
+            font-size: 16px;
+            font-weight: bold;
             color: #333;
+            margin-bottom: 12px;
+            text-align: center;
         }
-        .delete-confirm-buttons {
+        .modal-content {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: center;
+            white-space: pre-line;
+        }
+        .modal-buttons {
             display: flex;
             gap: 10px;
         }
-        .delete-confirm-btn {
+        .modal-btn {
             flex: 1;
-            padding: 8px;
+            padding: 10px;
             border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
+            border-radius: 8px;
+            font-size: 13px;
             font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
         }
-        .delete-confirm-btn.yes {
+        .modal-btn:hover {
+            opacity: 0.9;
+            transform: scale(0.98);
+        }
+        .modal-btn.confirm {
             background: #ff4d4d;
             color: white;
         }
-        .delete-confirm-btn.no {
+        .modal-btn.cancel {
             background: #f0f0f0;
             color: #666;
+        }
+        .modal-btn.ok {
+            background: var(--main);
+            color: white;
         }
     </style>
 </head>
@@ -814,8 +892,8 @@
     <!-- 点击特效画布 -->
     <canvas id="clickCanvas"></canvas>
 
-    <!-- 删除确认弹窗容器 - 动态生成 -->
-    <div id="deleteConfirmContainer"></div>
+    <!-- 通用弹窗容器 - 所有弹窗都放在这里 -->
+    <div id="modalContainer"></div>
 
     <!-- 用户信息弹窗容器 -->
     <div id="userProfileContainer"></div>
@@ -841,7 +919,7 @@
         <div class="owner-section">
             <div class="owner-label">👑 网站拥有者</div>
             <div class="owner-name">
-               饭饭 <span class="owner-badge">创始人/柚小屿</span>
+                饭饭 <span class="owner-badge">创始人/柚小屿</span>
             </div>
             <div style="font-size: 11px; color: #666; margin-top: 5px;">✨ 记录生活，分享美好</div>
         </div>
@@ -893,30 +971,30 @@
     <div id="devModal">
         <h3 style="margin:0 0 15px; text-align:center; font-size:16px">🛠️ 开发者配置</h3>
         
-        <!-- 管理员模式开关 -->
-        <div style="background:#ffe0e0; padding:10px; border-radius:10px; margin-bottom:15px">
-            <label style="font-size:11px; font-weight:bold">👑 管理员模式</label>
-            <div class="admin-mode-switch">
-                <span class="admin-mode-label">
-                    评论者模式 
-                    <span class="admin-badge" id="adminModeBadge">关闭</span>
+        <!-- 注册审核开关 -->
+        <div style="background:#e0f0e0; padding:10px; border-radius:10px; margin-bottom:15px">
+            <label style="font-size:11px; font-weight:bold">🔐 注册审核</label>
+            <div class="review-switch">
+                <span class="mode-label">
+                    需要审核 
+                    <span class="status-badge" id="reviewModeBadge" style="background:#ff9800">关闭</span>
                 </span>
-                <label class="admin-mode-toggle">
-                    <input type="checkbox" id="adminModeToggle" onchange="toggleAdminMode()">
+                <label class="mode-toggle">
+                    <input type="checkbox" id="reviewModeToggle" onchange="toggleReviewMode()">
                     <span class="toggle-slider"></span>
                 </label>
             </div>
             <div style="font-size:10px; color:#666; margin-top:5px; padding:0 5px;">
-                开启后可以删除任意用户的动态和评论
+                开启后新用户注册需要管理员审核通过才能登录
             </div>
         </div>
 
-        <!-- 用户身份管理 - 永久保存在云端 -->
+        <!-- 用户身份管理（包含审核和永久删除功能） -->
         <div class="identity-manager">
             <div class="identity-header" onclick="toggleIdentityList()">
                 <div class="identity-header-left">
                     <span class="identity-icon">👥</span>
-                    <span class="identity-title">用户身份管理（永久保存）</span>
+                    <span class="identity-title">用户管理（身份+审核+永久删除）</span>
                     <span class="identity-count" id="userCount">0</span>
                 </div>
                 <span class="identity-arrow" id="identityArrow">▶</span>
@@ -985,7 +1063,7 @@
         <!-- 操作按钮 -->
         <div style="display:flex; flex-direction:column; gap:6px; margin-top:15px">
             <button class="btn btn-pub" onclick="saveSettingsToCloud()">同步发布</button>
-            <button class="btn" style="background:#ff4d4d; color:white; padding:8px" onclick="resetSettings()">重置装修</button>
+            <button class="btn" style="background:#ff4d4d; color:white; padding:8px" onclick="showResetConfirm()">重置装修</button>
             <button class="btn" style="background:#eee; padding:8px" onclick="closeAll()">取消</button>
         </div>
     </div>
@@ -1022,8 +1100,9 @@
                 size: 30,
                 shape: "circle"
             },
-            adminMode: false,
-            userBadges: {} // 永久存储用户身份标签
+            reviewMode: false,
+            userBadges: {},
+            userStatus: {}
         };
         let currentUser = localStorage.getItem('sister_user') || null;
         let currentSignature = "✨ 这个人很懒，还没有签名~";
@@ -1031,8 +1110,57 @@
         let users = [];
         let effectSettings = { color: "#d4a373", size: 30, shape: "circle" };
         let particles = [];
-        let adminMode = false;
-        let userBadges = {}; // { username: "身份标签" } - 永久保存在云端
+        let reviewMode = false;
+        let userBadges = {};
+        let userStatus = {};
+
+        // 显示通用弹窗
+        function showModal(options) {
+            const {
+                title = '提示',
+                content = '',
+                showCancel = true,
+                confirmText = '确定',
+                cancelText = '取消',
+                onConfirm,
+                onCancel
+            } = options;
+
+            const container = document.getElementById('modalContainer');
+            container.innerHTML = `
+                <div class="custom-modal-overlay" onclick="if(event.target===this) closeModal()">
+                    <div class="custom-modal">
+                        <div class="modal-title">${title}</div>
+                        <div class="modal-content">${content}</div>
+                        <div class="modal-buttons">
+                            ${showCancel ? `
+                                <button class="modal-btn cancel" onclick="closeModal()">${cancelText}</button>
+                                <button class="modal-btn confirm" onclick="closeModal(); ${onConfirm ? '(' + onConfirm + ')' : ''}">${confirmText}</button>
+                            ` : `
+                                <button class="modal-btn ok" onclick="closeModal(); ${onConfirm ? '(' + onConfirm + ')' : ''}">${confirmText}</button>
+                            `}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function closeModal() {
+            document.getElementById('modalContainer').innerHTML = '';
+        }
+
+        // 切换审核模式
+        function toggleReviewMode() {
+            const toggle = document.getElementById('reviewModeToggle');
+            reviewMode = toggle.checked;
+            const badge = document.getElementById('reviewModeBadge');
+            badge.innerText = reviewMode ? '开启' : '关闭';
+            badge.style.background = reviewMode ? '#4caf50' : '#ff9800';
+            
+            if (document.getElementById('identityList').classList.contains('expanded')) {
+                renderUserList();
+            }
+        }
 
         // 切换用户身份列表显示
         function toggleIdentityList() {
@@ -1041,7 +1169,6 @@
             list.classList.toggle('expanded');
             arrow.classList.toggle('expanded');
             
-            // 展开时刷新用户列表
             if (list.classList.contains('expanded')) {
                 renderUserList();
             }
@@ -1063,20 +1190,36 @@
             let html = '';
             users.forEach(user => {
                 const badge = userBadges[user.username] || '普通用户';
+                const status = userStatus[user.username] || 'approved';
                 const createdDate = user.createdAt ? new Date(user.createdAt).toLocaleDateString() : '未知';
+                
+                let statusHtml = '';
+                if (status === 'pending') {
+                    statusHtml = '<span class="identity-status">待审核</span>';
+                } else if (status === 'approved') {
+                    statusHtml = '<span class="identity-status approved">已通过</span>';
+                }
                 
                 html += `
                     <div class="identity-item">
                         <div class="identity-user">
                             <div class="identity-user-avatar">${user.username.charAt(0).toUpperCase()}</div>
                             <div class="identity-user-info">
-                                <span class="identity-username">${user.username}</span>
+                                <span class="identity-username">${user.username} ${statusHtml}</span>
                                 <span class="identity-userdate">注册: ${createdDate}</span>
                             </div>
                         </div>
-                        <div class="identity-badge-edit">
-                            <input type="text" class="identity-badge-input" id="badge-${user.username}" value="${badge}" placeholder="身份">
-                            <button class="identity-save-btn" onclick="saveUserBadge('${user.username}')">永久保存</button>
+                        <div style="display: flex; flex-direction: column; gap: 5px;">
+                            <div class="identity-badge-edit">
+                                <input type="text" class="identity-badge-input" id="badge-${user.username}" value="${badge}" placeholder="身份">
+                                <button class="identity-save-btn" onclick="saveUserBadge('${user.username}')">保存</button>
+                            </div>
+                            <div style="display: flex; gap: 5px;">
+                                ${status === 'pending' ? `
+                                    <button class="identity-approve-btn" onclick="approveUser('${user.username}')">通过</button>
+                                ` : ''}
+                                <button class="identity-delete-btn" onclick="showDeleteUserConfirm('${user.username}')">永久删除</button>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -1085,28 +1228,118 @@
             list.innerHTML = html;
         }
 
-        // 保存用户身份标签 - 永久保存到云端
-        async function saveUserBadge(username) {
-            const input = document.getElementById(`badge-${username}`);
-            const newBadge = input.value.trim() || '普通用户';
-            
-            // 更新本地数据
-            userBadges[username] = newBadge;
+        // 显示删除用户确认弹窗
+        function showDeleteUserConfirm(username) {
+            showModal({
+                title: '⚠️ 永久删除用户',
+                content: `用户：${username}\n\n此操作将永久删除：\n• 用户账号\n• 所有发布的动态\n• 所有评论\n• 个人签名\n• 身份标签\n\n删除后不可恢复！`,
+                confirmText: '确定删除',
+                onConfirm: `deleteUserPermanently('${username}')`
+            });
+        }
+
+        // 通过用户审核
+        async function approveUser(username) {
+            userStatus[username] = 'approved';
             
             try {
-                // 获取当前云端数据
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.BIN}/latest`, { 
                     headers: { "X-Master-Key": CONFIG.KEY }
                 });
                 const data = await res.json();
                 
-                // 更新 userBadges
+                const updatedRecord = {
+                    ...data.record,
+                    userStatus: userStatus
+                };
+                
+                await updateCloud(updatedRecord);
+                
+                showAuthError(`✅ 已通过用户 ${username} 的审核`);
+                setTimeout(hideAuthError, 3000);
+                
+                renderUserList();
+            } catch (e) {
+                showAuthError("❌ 操作失败，请重试");
+                setTimeout(hideAuthError, 2000);
+            }
+        }
+
+        // 永久删除用户
+        async function deleteUserPermanently(username) {
+            try {
+                users = users.filter(u => u.username !== username);
+                
+                delete userBadges[username];
+                delete userStatus[username];
+                
+                if (window.signatureData && window.signatureData.owner === username) {
+                    window.signatureData = null;
+                }
+                if (signatureOwner === username) {
+                    currentSignature = "✨ 这个人很懒，还没有签名~";
+                    signatureOwner = null;
+                }
+                
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.BIN}/latest`, { 
+                    headers: { "X-Master-Key": CONFIG.KEY }
+                });
+                const data = await res.json();
+                let notes = data.record.notes || [];
+                
+                notes = notes.map(note => {
+                    if (note.author === username) {
+                        return null;
+                    }
+                    if (note.comments) {
+                        note.comments = note.comments.filter(c => c.user !== username);
+                    }
+                    return note;
+                }).filter(note => note !== null);
+                
+                const updatedRecord = {
+                    ...data.record,
+                    users: users,
+                    userBadges: userBadges,
+                    userStatus: userStatus,
+                    notes: notes,
+                    signature: window.signatureData
+                };
+                
+                await updateCloud(updatedRecord);
+                
+                showAuthError(`✅ 已永久删除用户 ${username} 及其所有相关内容`);
+                setTimeout(hideAuthError, 3000);
+                
+                if (currentUser === username) {
+                    logout();
+                }
+                
+                renderUserList();
+            } catch (e) {
+                showAuthError("❌ 删除失败，请重试");
+                setTimeout(hideAuthError, 2000);
+            }
+        }
+
+        // 保存用户身份标签
+        async function saveUserBadge(username) {
+            const input = document.getElementById(`badge-${username}`);
+            const newBadge = input.value.trim() || '普通用户';
+            
+            userBadges[username] = newBadge;
+            
+            try {
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.BIN}/latest`, { 
+                    headers: { "X-Master-Key": CONFIG.KEY }
+                });
+                const data = await res.json();
+                
                 const updatedBadges = {
                     ...(data.record.userBadges || {}),
                     [username]: newBadge
                 };
                 
-                // 保存到云端
                 const updatedRecord = {
                     ...data.record,
                     userBadges: updatedBadges
@@ -1114,11 +1347,9 @@
                 
                 await updateCloud(updatedRecord);
                 
-                // 显示成功提示
                 showAuthError(`✅ 已将 ${username} 的身份永久改为 "${newBadge}"，所有人可见`);
                 setTimeout(hideAuthError, 3000);
                 
-                // 重新渲染用户列表和动态
                 await loadData();
                 
             } catch (e) {
@@ -1127,9 +1358,16 @@
             }
         }
 
-        // 获取用户身份标签 - 永久显示
+        // 获取用户身份标签
         function getUserBadge(username) {
             return userBadges[username] || '普通用户';
+        }
+
+        // 检查用户是否可以登录
+        function canUserLogin(username) {
+            if (!reviewMode) return true;
+            const status = userStatus[username];
+            return status === 'approved';
         }
 
         // 显示用户信息弹窗
@@ -1208,31 +1446,24 @@
             }
         }
 
-        // 切换管理员模式
-        function toggleAdminMode() {
-            const toggle = document.getElementById('adminModeToggle');
-            adminMode = toggle.checked;
-            const badge = document.getElementById('adminModeBadge');
-            badge.innerText = adminMode ? '开启' : '关闭';
-            badge.style.background = adminMode ? '#ff4d4d' : '#999';
-            
-            loadData();
+        // 显示删除确认弹窗
+        function showDeleteConfirm(message, onConfirm) {
+            showModal({
+                title: '确认删除',
+                content: message,
+                confirmText: '确定',
+                onConfirm: onConfirm
+            });
         }
 
-        // 显示自定义删除确认弹窗
-        function showDeleteConfirm(message, onConfirm) {
-            const container = document.getElementById('deleteConfirmContainer');
-            container.innerHTML = `
-                <div class="delete-confirm-overlay">
-                    <div class="delete-confirm-box">
-                        <p>${message}</p>
-                        <div class="delete-confirm-buttons">
-                            <button class="delete-confirm-btn yes" onclick="this.closest('.delete-confirm-overlay').remove(); ${onConfirm}">确定</button>
-                            <button class="delete-confirm-btn no" onclick="this.closest('.delete-confirm-overlay').remove()">取消</button>
-                        </div>
-                    </div>
-                </div>
-            `;
+        // 显示重置确认弹窗
+        function showResetConfirm() {
+            showModal({
+                title: '重置装修',
+                content: '确定要重置所有装修设置吗？',
+                confirmText: '确定重置',
+                onConfirm: 'resetSettings()'
+            });
         }
 
         // 点击特效系统
@@ -1432,19 +1663,25 @@
                 return;
             }
             
+            const newUserStatus = reviewMode ? 'pending' : 'approved';
+            userStatus[n] = newUserStatus;
+            
             users.push({
                 username: n,
                 password: p,
                 createdAt: new Date().toISOString()
             });
             
-            // 为新用户设置默认身份（永久保存）
             userBadges[n] = '普通用户';
             
             const success = await saveUsers(users);
             
             if (success) {
-                showAuthError("✅ 注册成功！请登录");
+                if (reviewMode) {
+                    showAuthError("✅ 注册成功！请等待管理员审核");
+                } else {
+                    showAuthError("✅ 注册成功！请登录");
+                }
                 document.getElementById('uPass').value = '';
             } else {
                 showAuthError("❌ 注册失败，请重试");
@@ -1477,6 +1714,16 @@
             
             if (user.password !== p) {
                 showAuthError("❌ 密码错误");
+                return;
+            }
+            
+            if (!canUserLogin(n)) {
+                const status = userStatus[n];
+                if (status === 'pending') {
+                    showAuthError("⏳ 您的账号正在审核中，请等待管理员通过");
+                } else {
+                    showAuthError("❌ 账号状态异常，无法登录");
+                }
                 return;
             }
             
@@ -1527,20 +1774,23 @@
                     document.documentElement.style.setProperty('--effect-size', effectSettings.size + 'px');
                 }
                 
-                if (d.record.adminMode !== undefined) {
-                    adminMode = d.record.adminMode;
-                    const toggle = document.getElementById('adminModeToggle');
+                if (d.record.reviewMode !== undefined) {
+                    reviewMode = d.record.reviewMode;
+                    const toggle = document.getElementById('reviewModeToggle');
                     if (toggle) {
-                        toggle.checked = adminMode;
-                        const badge = document.getElementById('adminModeBadge');
-                        badge.innerText = adminMode ? '开启' : '关闭';
-                        badge.style.background = adminMode ? '#ff4d4d' : '#999';
+                        toggle.checked = reviewMode;
+                        const badge = document.getElementById('reviewModeBadge');
+                        badge.innerText = reviewMode ? '开启' : '关闭';
+                        badge.style.background = reviewMode ? '#4caf50' : '#ff9800';
                     }
                 }
                 
-                // 加载用户身份标签（永久保存）
                 if (d.record.userBadges) {
                     userBadges = d.record.userBadges;
+                }
+                
+                if (d.record.userStatus) {
+                    userStatus = d.record.userStatus;
                 }
                 
                 if (d.record.signature) {
@@ -1562,7 +1812,6 @@
                 
                 if (d.record.users) {
                     users = d.record.users;
-                    // 更新用户数量显示
                     const userCount = document.getElementById('userCount');
                     if (userCount) userCount.innerText = users.length;
                 }
@@ -1608,7 +1857,7 @@
                 
                 const post = notes[noteIdx];
                 
-                if (!adminMode && post.author !== currentUser) {
+                if (post.author !== currentUser) {
                     showAuthError("只能删除自己的动态");
                     return;
                 }
@@ -1628,11 +1877,11 @@
             [...notes].map((n, i) => ({...n, rIdx: i})).reverse().forEach(note => {
                 const div = document.createElement('div'); div.className = 'card';
                 
-                const canDeletePost = currentUser && (adminMode || note.author === currentUser);
+                const canDeletePost = currentUser && note.author === currentUser;
                 const authorBadge = getUserBadge(note.author);
                 
                 const comms = (note.comments || []).map((c, ci) => {
-                    const canDeleteComment = currentUser && (adminMode || c.user === currentUser);
+                    const canDeleteComment = currentUser && c.user === currentUser;
                     const commenterBadge = getUserBadge(c.user);
                     
                     return `
@@ -1695,7 +1944,7 @@
                 
                 const comment = notes[noteIdx].comments[commentIdx];
                 
-                if (!adminMode && comment.user !== currentUser) {
+                if (comment.user !== currentUser) {
                     showAuthError("只能删除自己的评论");
                     return;
                 }
@@ -1844,7 +2093,7 @@
                 updatedAt: new Date().toISOString()
             } : null;
             
-            const adminModeState = document.getElementById('adminModeToggle').checked;
+            const reviewModeState = document.getElementById('reviewModeToggle').checked;
             
             await updateCloud({ 
                 ...data.record, 
@@ -1852,33 +2101,33 @@
                 effect: effectSettings,
                 signature: signatureData, 
                 users: users,
-                adminMode: adminModeState,
-                userBadges: userBadges // 永久保存用户身份标签
+                reviewMode: reviewModeState,
+                userBadges: userBadges,
+                userStatus: userStatus
             }); 
             closeAll();
         }
         async function resetSettings() { 
-            if(confirm("重置所有装修？")) { 
-                const res = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.BIN}/latest`, { headers: { "X-Master-Key": CONFIG.KEY }}); 
-                const data = await res.json(); 
-                
-                const signatureData = currentSignature ? {
-                    content: currentSignature,
-                    owner: signatureOwner || currentUser || 'unknown',
-                    updatedAt: new Date().toISOString()
-                } : null;
-                
-                await updateCloud({ 
-                    ...data.record, 
-                    settings: DEFAULT_S, 
-                    effect: DEFAULT_S.effect,
-                    signature: signatureData, 
-                    users: users,
-                    adminMode: false,
-                    userBadges: {} // 重置身份标签
-                }); 
-                closeAll(); 
-            } 
+            const res = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.BIN}/latest`, { headers: { "X-Master-Key": CONFIG.KEY }}); 
+            const data = await res.json(); 
+            
+            const signatureData = currentSignature ? {
+                content: currentSignature,
+                owner: signatureOwner || currentUser || 'unknown',
+                updatedAt: new Date().toISOString()
+            } : null;
+            
+            await updateCloud({ 
+                ...data.record, 
+                settings: DEFAULT_S, 
+                effect: DEFAULT_S.effect,
+                signature: signatureData, 
+                users: users,
+                reviewMode: false,
+                userBadges: {},
+                userStatus: {}
+            }); 
+            closeAll(); 
         }
         function toggleHistory() { const b = document.getElementById('historyBox'); b.style.display = b.style.display === 'block' ? 'none' : 'block'; }
         function toggleMenu() { document.getElementById('sidePanel').classList.toggle('open'); document.getElementById('overlay').style.display = 'block'; updateUserUI(); updateSignatureOwner(); }
@@ -1898,13 +2147,12 @@
                     }
                 });
                 
-                const toggle = document.getElementById('adminModeToggle');
-                toggle.checked = adminMode;
-                const badge = document.getElementById('adminModeBadge');
-                badge.innerText = adminMode ? '开启' : '关闭';
-                badge.style.background = adminMode ? '#ff4d4d' : '#999';
+                const reviewToggle = document.getElementById('reviewModeToggle');
+                reviewToggle.checked = reviewMode;
+                const reviewBadge = document.getElementById('reviewModeBadge');
+                reviewBadge.innerText = reviewMode ? '开启' : '关闭';
+                reviewBadge.style.background = reviewMode ? '#4caf50' : '#ff9800';
                 
-                // 刷新用户列表
                 renderUserList();
                 
                 updatePreview();
