@@ -367,7 +367,7 @@
             text-align: center;
         }
 
-        /* 开发者模式 - 点击特效设置 */
+        /* 开发者模式 - 点击特效设置和管理员模式 */
         .effect-preview {
             width: 100%;
             height: 50px;
@@ -412,6 +412,69 @@
             color: white;
         }
 
+        /* 管理员模式开关样式 */
+        .admin-mode-switch {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f0f0f0;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-top: 8px;
+        }
+        .admin-mode-label {
+            font-size: 11px;
+            font-weight: bold;
+            color: #333;
+        }
+        .admin-mode-toggle {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 22px;
+        }
+        .admin-mode-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .3s;
+            border-radius: 22px;
+        }
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+        input:checked + .toggle-slider {
+            background-color: var(--main);
+        }
+        input:checked + .toggle-slider:before {
+            transform: translateX(22px);
+        }
+        .admin-badge {
+            background: #ff4d4d;
+            color: white;
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 5px;
+        }
+
         #devModal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 380px; background: white; z-index: 3000; padding: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); max-height: 85vh; overflow-y: auto; display: none; border-radius: 20px; }
         #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: none; z-index: 1999; backdrop-filter: blur(4px); }
         
@@ -419,7 +482,7 @@
         @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .card, .input-card, .btn, .notice-box { border-radius: var(--radius) !important; }
 
-        /* 删除确认弹窗样式 - 直接写在页面内 */
+        /* 删除确认弹窗样式 */
         .delete-confirm-overlay {
             position: fixed;
             top: 0;
@@ -497,7 +560,7 @@
         <div class="owner-section">
             <div class="owner-label">👑 网站拥有者</div>
             <div class="owner-name">
-                饭饭 <span class="owner-badge">创始人/柚小屿</span>
+                麦麦 <span class="owner-badge">创始人</span>
             </div>
             <div style="font-size: 11px; color: #666; margin-top: 5px;">✨ 记录生活，分享美好</div>
         </div>
@@ -549,6 +612,24 @@
     <div id="devModal">
         <h3 style="margin:0 0 15px; text-align:center; font-size:16px">🛠️ 开发者配置</h3>
         
+        <!-- 新增：管理员模式开关 -->
+        <div style="background:#ffe0e0; padding:10px; border-radius:10px; margin-bottom:15px">
+            <label style="font-size:11px; font-weight:bold">👑 管理员模式</label>
+            <div class="admin-mode-switch">
+                <span class="admin-mode-label">
+                    评论者模式 
+                    <span class="admin-badge" id="adminModeBadge">关闭</span>
+                </span>
+                <label class="admin-mode-toggle">
+                    <input type="checkbox" id="adminModeToggle" onchange="toggleAdminMode()">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            <div style="font-size:10px; color:#666; margin-top:5px; padding:0 5px;">
+                开启后可以删除任意用户的动态和评论
+            </div>
+        </div>
+
         <!-- 公告更新区域 -->
         <div style="background:#f0f7ff; padding:10px; border-radius:10px; margin-bottom:15px">
             <label style="font-size:11px; font-weight:bold">公告更新</label>
@@ -644,7 +725,8 @@
                 color: "#d4a373",
                 size: 30,
                 shape: "circle"
-            }
+            },
+            adminMode: false  // 新增：管理员模式默认关闭
         };
         let currentUser = localStorage.getItem('sister_user') || null;
         let currentSignature = "✨ 这个人很懒，还没有签名~";
@@ -652,6 +734,19 @@
         let users = [];
         let effectSettings = { color: "#d4a373", size: 30, shape: "circle" };
         let particles = [];
+        let adminMode = false; // 管理员模式状态
+
+        // 切换管理员模式
+        function toggleAdminMode() {
+            const toggle = document.getElementById('adminModeToggle');
+            adminMode = toggle.checked;
+            const badge = document.getElementById('adminModeBadge');
+            badge.innerText = adminMode ? '开启' : '关闭';
+            badge.style.background = adminMode ? '#ff4d4d' : '#999';
+            
+            // 重新渲染以更新删除按钮
+            loadData();
+        }
 
         // 显示自定义删除确认弹窗
         function showDeleteConfirm(message, onConfirm) {
@@ -966,6 +1061,18 @@
                     document.documentElement.style.setProperty('--effect-size', effectSettings.size + 'px');
                 }
                 
+                // 加载管理员模式状态
+                if (d.record.adminMode !== undefined) {
+                    adminMode = d.record.adminMode;
+                    const toggle = document.getElementById('adminModeToggle');
+                    if (toggle) {
+                        toggle.checked = adminMode;
+                        const badge = document.getElementById('adminModeBadge');
+                        badge.innerText = adminMode ? '开启' : '关闭';
+                        badge.style.background = adminMode ? '#ff4d4d' : '#999';
+                    }
+                }
+                
                 applyStyles(d.record.settings); 
                 render(d.record.notes || []);
                 
@@ -1021,14 +1128,16 @@
                 const data = await res.json();
                 let notes = data.record.notes || [];
                 
-                // 检查动态是否存在且属于当前用户
+                // 检查动态是否存在
                 if (!notes[noteIdx]) {
                     showAuthError("动态不存在");
                     return;
                 }
                 
                 const post = notes[noteIdx];
-                if (post.author !== currentUser) {
+                
+                // 管理员模式或作者本人可以删除
+                if (!adminMode && post.author !== currentUser) {
                     showAuthError("只能删除自己的动态");
                     return;
                 }
@@ -1049,12 +1158,13 @@
             [...notes].map((n, i) => ({...n, rIdx: i})).reverse().forEach(note => {
                 const div = document.createElement('div'); div.className = 'card';
                 
-                // 检查当前用户是否是动态作者
-                const isOwnPost = currentUser && note.author === currentUser;
+                // 检查是否可以删除动态（管理员模式 或 自己是作者）
+                const canDeletePost = currentUser && (adminMode || note.author === currentUser);
                 
                 // 构建评论列表
                 const comms = (note.comments || []).map((c, ci) => {
-                    const isOwnComment = currentUser && c.user === currentUser;
+                    // 检查是否可以删除评论（管理员模式 或 自己是评论作者）
+                    const canDeleteComment = currentUser && (adminMode || c.user === currentUser);
                     
                     return `
                         <div class="comment-item">
@@ -1063,7 +1173,7 @@
                             </div>
                             <div class="comment-actions">
                                 <span class="comment-like" onclick="handleLike(${note.rIdx}, ${ci})">👍 ${c.likes || 0}</span>
-                                ${isOwnComment ? `<span class="comment-delete" onclick="showDeleteConfirm('确定要删除这条评论吗？', 'deleteComment(${note.rIdx}, ${ci})')" title="删除评论">🗑️</span>` : ''}
+                                ${canDeleteComment ? `<span class="comment-delete" onclick="showDeleteConfirm('确定要删除这条评论吗？', 'deleteComment(${note.rIdx}, ${ci})')" title="删除评论">🗑️</span>` : ''}
                             </div>
                         </div>
                     `;
@@ -1075,7 +1185,7 @@
                             <span class="author-name">👤 ${note.author}</span>
                             <span class="post-time">${note.time}</span>
                         </div>
-                        ${isOwnPost ? `<span class="post-delete-btn" onclick="showDeleteConfirm('确定要删除这条动态吗？', 'deletePost(${note.rIdx})')" title="删除动态">🗑️</span>` : ''}
+                        ${canDeletePost ? `<span class="post-delete-btn" onclick="showDeleteConfirm('确定要删除这条动态吗？', 'deletePost(${note.rIdx})')" title="删除动态">🗑️</span>` : ''}
                     </div>
                     <div class="post-text">${note.content}</div>
                     <div class="action-bar">
@@ -1108,14 +1218,16 @@
                 const data = await res.json();
                 let notes = data.record.notes || [];
                 
-                // 检查评论是否存在且属于当前用户
+                // 检查评论是否存在
                 if (!notes[noteIdx] || !notes[noteIdx].comments || !notes[noteIdx].comments[commentIdx]) {
                     showAuthError("评论不存在");
                     return;
                 }
                 
                 const comment = notes[noteIdx].comments[commentIdx];
-                if (comment.user !== currentUser) {
+                
+                // 管理员模式或评论作者本人可以删除
+                if (!adminMode && comment.user !== currentUser) {
                     showAuthError("只能删除自己的评论");
                     return;
                 }
@@ -1266,12 +1378,16 @@
                 updatedAt: new Date().toISOString()
             } : null;
             
+            // 保存管理员模式状态
+            const adminModeState = document.getElementById('adminModeToggle').checked;
+            
             await updateCloud({ 
                 ...data.record, 
                 settings: upd, 
                 effect: effectSettings,
                 signature: signatureData, 
-                users: users 
+                users: users,
+                adminMode: adminModeState
             }); 
             closeAll();
         }
@@ -1291,7 +1407,8 @@
                     settings: DEFAULT_S, 
                     effect: DEFAULT_S.effect,
                     signature: signatureData, 
-                    users: users 
+                    users: users,
+                    adminMode: false
                 }); 
                 closeAll(); 
             } 
@@ -1315,6 +1432,13 @@
                         opt.classList.remove('selected');
                     }
                 });
+                
+                // 设置管理员模式开关状态
+                const toggle = document.getElementById('adminModeToggle');
+                toggle.checked = adminMode;
+                const badge = document.getElementById('adminModeBadge');
+                badge.innerText = adminMode ? '开启' : '关闭';
+                badge.style.background = adminMode ? '#ff4d4d' : '#999';
                 
                 updatePreview();
                 document.getElementById('devModal').style.display = 'block'; 
