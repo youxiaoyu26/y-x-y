@@ -45,7 +45,7 @@
         .ver-badge { background: var(--main); color: white; padding: 1px 5px; border-radius: 4px; font-size: 9px; margin-bottom: 3px; display: inline-block; }
         .notice-content { font-size: 12.5px; color: #444; line-height: 1.5; }
         
-        /* 网站拥有者样式 - 修改为饭饭和创始人/柚小屿 */
+        /* 网站拥有者样式 */
         .owner-section {
             background: rgba(242, 166, 116, 0.08);
             border-left: 2px solid var(--main);
@@ -214,7 +214,7 @@
             cursor: pointer;
         }
 
-        /* 动态卡片 - 永久显示身份标签 */
+        /* 动态卡片 - 支持多图显示 */
         .card { 
             background: rgba(255,255,255,0.9); 
             padding: 12px 15px; 
@@ -280,6 +280,26 @@
             white-space: pre-wrap; 
             margin-bottom: 8px; 
         }
+        .post-images {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 8px;
+            margin-bottom: 8px;
+        }
+        .post-image {
+            width: calc(33.33% - 4px);
+            max-height: 120px;
+            object-fit: cover;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            background: #f5f5f5;
+            aspect-ratio: 1/1;
+        }
+        .post-image:hover {
+            transform: scale(1.02);
+        }
 
         /* 按钮并排 */
         .action-bar { display: flex; border-top: 1px solid #fcfcfc; padding-top: 8px; }
@@ -316,6 +336,65 @@
             align-items: center; 
             justify-content: center; 
             box-sizing: border-box;
+        }
+
+        /* 多图上传区域 */
+        .image-upload-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+        .image-upload-btn {
+            background: #f0f0f0;
+            color: #666;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .image-upload-btn:hover {
+            background: #e0e0e0;
+        }
+        .image-previews {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 5px;
+            width: 100%;
+        }
+        .preview-item {
+            position: relative;
+            width: 70px;
+            height: 70px;
+        }
+        .preview-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+        }
+        .remove-image-btn {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         /* 评论区域 - 永久显示身份标签 */
@@ -398,6 +477,31 @@
             font-weight: bold;
             box-sizing: border-box;
             text-align: center;
+        }
+
+        /* 图片查看器弹窗样式 */
+        .image-viewer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 20000;
+            cursor: pointer;
+        }
+        .image-viewer-content {
+            max-width: 90%;
+            max-height: 90%;
+        }
+        .image-viewer-content img {
+            max-width: 100%;
+            max-height: 90vh;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
 
         /* 用户信息弹窗样式 */
@@ -680,6 +784,34 @@
             font-size: 9px;
             cursor: pointer;
             margin-left: 5px;
+        }
+        /* 搜索框样式 */
+        .search-container {
+            padding: 8px 10px;
+            background: white;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            display: flex;
+            gap: 5px;
+        }
+        .search-input {
+            flex: 1;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+        .search-cancel {
+            background: #f0f0f0;
+            color: #666;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            font-size: 11px;
+            cursor: pointer;
+        }
+        .search-cancel:hover {
+            background: #e0e0e0;
         }
 
         /* 审核开关样式 */
@@ -999,6 +1131,9 @@
     <!-- 用户信息弹窗容器 -->
     <div id="userProfileContainer"></div>
 
+    <!-- 图片查看器容器 -->
+    <div id="imageViewerContainer"></div>
+
     <!-- 欢迎标语容器 - 动态生成 -->
     <div id="welcomeContainer"></div>
 
@@ -1019,7 +1154,7 @@
         <span style="font-size:11px; color:var(--main); cursor:pointer; margin-top:8px; display:block" onclick="toggleHistory()">历史更新记录 ↓</span>
         <div id="historyBox" style="display:none; margin-top:10px; border-top:1px dashed #eee; padding-top:8px"></div>
 
-        <!-- 网站拥有者信息 - 修改为饭饭和创始人/柚小屿 -->
+        <!-- 网站拥有者信息 -->
         <div class="owner-section">
             <div class="owner-label">👑 网站拥有者</div>
             <div class="owner-name">
@@ -1075,7 +1210,7 @@
     <div id="devModal">
         <h3 style="margin:0 0 15px; text-align:center; font-size:16px">🛠️ 开发者配置</h3>
         
-        <!-- 注册审核开关 -->
+        <!-- 注册审核开关 - 开启后新用户需要审核才能登录 -->
         <div style="background:#e0f0e0; padding:10px; border-radius:10px; margin-bottom:15px">
             <label style="font-size:11px; font-weight:bold">🔐 注册审核</label>
             <div class="review-switch">
@@ -1089,11 +1224,11 @@
                 </label>
             </div>
             <div style="font-size:10px; color:#666; margin-top:5px; padding:0 5px;">
-                开启后新用户注册需要管理员审核通过才能登录
+                开启后新用户注册需要管理员审核通过才能登录，未同意的账号将被自动删除
             </div>
         </div>
 
-        <!-- 用户身份管理 - 带动画 -->
+        <!-- 用户身份管理 - 包含审核和永久删除功能，增加搜索框 -->
         <div class="identity-manager">
             <div class="identity-header" onclick="toggleIdentityList()">
                 <div class="identity-header-left">
@@ -1104,7 +1239,13 @@
                 <span class="identity-arrow" id="identityArrow">▶</span>
             </div>
             <div class="identity-list" id="identityList">
+                <!-- 搜索框 -->
+                <div class="search-container">
+                    <input type="text" id="userSearchInput" class="search-input" placeholder="输入用户名搜索..." oninput="filterUserList()">
+                    <button class="search-cancel" onclick="clearUserSearch()">取消</button>
+                </div>
                 <!-- 用户列表会动态生成 -->
+                <div id="userListContainer"></div>
             </div>
         </div>
 
@@ -1115,7 +1256,7 @@
             <textarea id="devNotice" style="width:100%; height:40px; margin-top:4px; padding:5px; font-size:12px; box-sizing:border-box" placeholder="内容..."></textarea>
         </div>
 
-        <!-- 可折叠的设置分类 - 带动画 -->
+        <!-- 可折叠的设置分类 -->
         <div class="settings-category">
             <div class="category-header" onclick="toggleSettingsCategory()">
                 <span class="category-arrow" id="settingsArrow">▶</span>
@@ -1157,7 +1298,7 @@
                     </div>
                 </div>
 
-                <!-- 主题设置区域 - 主色默认F2A674，背景色默认EBEBEB -->
+                <!-- 主题设置区域 -->
                 <div style="background:#f0f0f0; padding:10px; border-radius:10px">
                     <label style="font-size:11px; font-weight:bold">🎨 主题设置</label>
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:8px">
@@ -1173,7 +1314,7 @@
             </div>
         </div>
 
-        <!-- 操作按钮 - 已删除重置装修按钮，只保留同步发布和取消 -->
+        <!-- 操作按钮 -->
         <div style="display:flex; flex-direction:column; gap:6px; margin-top:15px">
             <button class="btn btn-pub" onclick="saveSettingsToCloud()">同步发布</button>
             <button class="btn" style="background:#eee; padding:8px" onclick="closeAll()">取消</button>
@@ -1183,6 +1324,14 @@
     <div class="container">
         <div id="status">连接中...</div>
         <div class="input-card">
+            <!-- 多图上传区域 -->
+            <div class="image-upload-container">
+                <input type="file" id="imageInput" accept="image/*" multiple style="display:none" onchange="handleImageSelect(event)">
+                <button class="image-upload-btn" onclick="document.getElementById('imageInput').click()">
+                    <span>📷</span> 选择图片 (最多3张)
+                </button>
+                <div class="image-previews" id="imagePreviews"></div>
+            </div>
             <textarea id="msgInput" placeholder="在此分享你的动态..."></textarea>
             <div class="btn-group">
                 <button class="btn btn-pub" onclick="publish()">发布</button>
@@ -1198,7 +1347,6 @@
             BIN: "699c4b22ae596e708f424292",
             DEV_PASS: "作者最帅"
         };
-        // 修改默认设置：主色#F2A674，背景色#EBEBEB
         const DEFAULT_S = { 
             theme: "#F2A674", 
             bgCol: "#EBEBEB", 
@@ -1226,8 +1374,129 @@
         let reviewMode = false;
         let userBadges = {};
         let userStatus = {};
+        let currentSearchTerm = ''; // 当前搜索词
+        let selectedImages = []; // 存储选择的图片文件 { file, preview }
 
-        // 切换设置分类折叠状态 - 带动画
+        // 图片压缩函数（大幅压缩以符合JSONBin大小限制）
+        function compressImage(file, maxWidth = 400, maxHeight = 400, quality = 0.6) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        
+                        // 计算缩放比例
+                        if (width > height) {
+                            if (width > maxWidth) {
+                                height *= maxWidth / width;
+                                width = maxWidth;
+                            }
+                        } else {
+                            if (height > maxHeight) {
+                                width *= maxHeight / height;
+                                height = maxHeight;
+                            }
+                        }
+                        
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        // 压缩为JPEG格式，低质量
+                        canvas.toBlob((blob) => {
+                            const compressedFile = new File([blob], file.name, {
+                                type: 'image/jpeg',
+                                lastModified: Date.now()
+                            });
+                            const reader2 = new FileReader();
+                            reader2.readAsDataURL(compressedFile);
+                            reader2.onload = (e2) => {
+                                resolve(e2.target.result);
+                            };
+                        }, 'image/jpeg', quality);
+                    };
+                    img.onerror = reject;
+                };
+                reader.onerror = reject;
+            });
+        }
+
+        // 多图处理函数
+        async function handleImageSelect(event) {
+            const files = Array.from(event.target.files);
+            if (files.length + selectedImages.length > 3) {
+                showAuthError("最多只能选择3张图片");
+                return;
+            }
+            
+            // 检查每个文件大小（压缩前限制在5MB以内）
+            for (let file of files) {
+                if (file.size > 5 * 1024 * 1024) {
+                    showAuthError("单张图片不能超过5MB");
+                    return;
+                }
+            }
+            
+            // 读取预览
+            for (let file of files) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    selectedImages.push({
+                        file: file,
+                        preview: e.target.result
+                    });
+                    renderImagePreviews();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // 渲染图片预览
+        function renderImagePreviews() {
+            const container = document.getElementById('imagePreviews');
+            container.innerHTML = '';
+            selectedImages.forEach((img, index) => {
+                const div = document.createElement('div');
+                div.className = 'preview-item';
+                div.innerHTML = `
+                    <img src="${img.preview}" class="preview-image">
+                    <button class="remove-image-btn" onclick="removeImage(${index})">×</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // 移除图片
+        function removeImage(index) {
+            selectedImages.splice(index, 1);
+            renderImagePreviews();
+        }
+
+        // 清空所有图片
+        function clearImages() {
+            selectedImages = [];
+            renderImagePreviews();
+        }
+
+        // 显示图片查看器
+        function showImageViewer(imageUrl) {
+            const container = document.getElementById('imageViewerContainer');
+            container.innerHTML = `
+                <div class="image-viewer-overlay" onclick="this.remove()">
+                    <div class="image-viewer-content">
+                        <img src="${imageUrl}" alt="查看图片" oncontextmenu="return true">
+                    </div>
+                </div>
+            `;
+        }
+
+        // 切换设置分类折叠状态
         function toggleSettingsCategory() {
             const content = document.getElementById('settingsContent');
             const arrow = document.getElementById('settingsArrow');
@@ -1321,19 +1590,15 @@
             const arrow = document.getElementById('identityArrow');
             
             if (list.classList.contains('expanded')) {
-                // 收起时先清空内容，避免动画卡顿
                 list.classList.remove('expanded');
                 arrow.classList.remove('expanded');
-                // 延迟清空内容，等待动画完成
                 setTimeout(() => {
                     if (!list.classList.contains('expanded')) {
-                        list.innerHTML = '';
+                        document.getElementById('userListContainer').innerHTML = '';
                     }
                 }, 300);
             } else {
-                // 展开时先渲染内容再添加类
                 renderUserList();
-                // 使用setTimeout确保内容已渲染
                 setTimeout(() => {
                     list.classList.add('expanded');
                     arrow.classList.add('expanded');
@@ -1341,21 +1606,48 @@
             }
         }
 
+        // 过滤用户列表
+        function filterUserList() {
+            const searchInput = document.getElementById('userSearchInput');
+            currentSearchTerm = searchInput.value.toLowerCase().trim();
+            renderUserList();
+        }
+
+        // 清除搜索
+        function clearUserSearch() {
+            document.getElementById('userSearchInput').value = '';
+            currentSearchTerm = '';
+            renderUserList();
+        }
+
         // 渲染用户列表
         function renderUserList() {
-            const list = document.getElementById('identityList');
+            const container = document.getElementById('userListContainer');
             const userCount = document.getElementById('userCount');
             
             if (!users || users.length === 0) {
-                list.innerHTML = '<div style="text-align:center; padding:10px; color:#999">暂无用户</div>';
+                container.innerHTML = '<div style="text-align:center; padding:10px; color:#999">暂无用户</div>';
                 userCount.innerText = '0';
                 return;
             }
             
-            userCount.innerText = users.length;
+            // 过滤用户
+            let filteredUsers = users;
+            if (currentSearchTerm) {
+                filteredUsers = users.filter(user => 
+                    user.username.toLowerCase().includes(currentSearchTerm)
+                );
+            }
+            
+            userCount.innerText = filteredUsers.length;
+            
+            if (filteredUsers.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:10px; color:#999">未找到匹配的用户</div>';
+                return;
+            }
             
             let html = '';
-            users.forEach(user => {
+            filteredUsers.forEach(user => {
                 const badge = userBadges[user.username] || '普通用户';
                 const status = userStatus[user.username] || 'approved';
                 const createdDate = user.createdAt ? new Date(user.createdAt).toLocaleDateString() : '未知';
@@ -1384,15 +1676,17 @@
                             <div style="display: flex; gap: 5px;">
                                 ${status === 'pending' ? `
                                     <button class="identity-approve-btn" onclick="approveUser('${user.username}')">通过</button>
-                                ` : ''}
-                                <button class="identity-delete-btn" onclick="showDeleteUserConfirm('${user.username}')">永久删除</button>
+                                    <button class="identity-delete-btn" onclick="showDeleteUserConfirm('${user.username}')">拒绝并删除</button>
+                                ` : `
+                                    <button class="identity-delete-btn" onclick="showDeleteUserConfirm('${user.username}')">永久删除</button>
+                                `}
                             </div>
                         </div>
                     </div>
                 `;
             });
             
-            list.innerHTML = html;
+            container.innerHTML = html;
         }
 
         // 显示删除用户确认弹窗
@@ -1422,7 +1716,7 @@
                 
                 await updateCloud(updatedRecord);
                 
-                showAuthError(`✅ 已通过用户 ${username} 的审核`);
+                showAuthError(`✅ 已通过用户 ${username} 的审核，该用户可以登录了`);
                 setTimeout(hideAuthError, 3000);
                 
                 renderUserList();
@@ -1820,6 +2114,7 @@
                 return;
             }
             
+            // 新用户状态：如果需要审核则为pending，否则为approved
             const newUserStatus = reviewMode ? 'pending' : 'approved';
             userStatus[n] = newUserStatus;
             
@@ -1835,7 +2130,7 @@
             
             if (success) {
                 if (reviewMode) {
-                    showAuthError("✅ 注册成功！请等待管理员审核");
+                    showAuthError("✅ 注册成功！请等待管理员审核，未通过审核的账号将被自动删除");
                 } else {
                     showAuthError("✅ 注册成功！请登录");
                 }
@@ -1916,7 +2211,10 @@
                     body: JSON.stringify(newData) 
                 });
                 await loadData();
-            } catch (e) { }
+            } catch (e) { 
+                showAuthError("❌ 同步失败，数据可能过大");
+                setTimeout(hideAuthError, 3000);
+            }
         }
 
         async function loadData() {
@@ -1969,8 +2267,17 @@
                 
                 if (d.record.users) {
                     users = d.record.users;
-                    const userCount = document.getElementById('userCount');
-                    if (userCount) userCount.innerText = users.length;
+                }
+                
+                // 更新计数但不重新渲染，避免覆盖搜索状态
+                if (document.getElementById('identityList').classList.contains('expanded')) {
+                    // 只更新计数，不重新渲染列表
+                    const filteredCount = currentSearchTerm ? 
+                        users.filter(u => u.username.toLowerCase().includes(currentSearchTerm)).length : 
+                        users.length;
+                    document.getElementById('userCount').innerText = filteredCount;
+                } else {
+                    document.getElementById('userCount').innerText = users.length;
                 }
                 
                 document.getElementById('signatureDisplay').innerText = currentSignature;
@@ -2037,6 +2344,16 @@
                 const canDeletePost = currentUser && note.author === currentUser;
                 const authorBadge = getUserBadge(note.author);
                 
+                // 处理多图显示
+                let imagesHtml = '';
+                if (note.images && note.images.length > 0) {
+                    imagesHtml = '<div class="post-images">';
+                    note.images.forEach(img => {
+                        imagesHtml += `<img src="${img}" class="post-image" onclick="showImageViewer('${img}')" alt="动态图片" oncontextmenu="return true">`;
+                    });
+                    imagesHtml += '</div>';
+                }
+                
                 const comms = (note.comments || []).map((c, ci) => {
                     const canDeleteComment = currentUser && c.user === currentUser;
                     const commenterBadge = getUserBadge(c.user);
@@ -2065,6 +2382,7 @@
                         ${canDeletePost ? `<span class="post-delete-btn" onclick="showDeleteConfirm('确定要删除这条动态吗？', 'deletePost(${note.rIdx})')" title="删除动态">🗑️</span>` : ''}
                     </div>
                     <div class="post-text">${note.content}</div>
+                    ${imagesHtml}
                     <div class="action-bar">
                         <div class="action-btn" onclick="handleLike(${note.rIdx})">👍 ${note.likes || 0}</div>
                         <div class="action-btn" onclick="toggleComments(${note.rIdx})">💬 ${(note.comments || []).length}</div>
@@ -2214,11 +2532,48 @@
                 setTimeout(hideAuthError, 3000);
                 return;
             }
-            const input = document.getElementById('msgInput'); if(!input.value.trim()) return;
+            
+            const content = document.getElementById('msgInput').value.trim();
+            if (!content && selectedImages.length === 0) {
+                showAuthError("请输入内容或选择图片");
+                return;
+            }
+            
+            // 压缩所有图片
+            showAuthError("正在压缩图片...");
+            const compressedImages = [];
+            for (let img of selectedImages) {
+                const compressed = await compressImage(img.file);
+                compressedImages.push(compressed);
+            }
+            
             const res = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.BIN}/latest`, { headers: { "X-Master-Key": CONFIG.KEY }});
-            const data = await res.json(); let notes = data.record.notes || [];
-            notes.push({ author: currentUser, content: input.value, time: new Date().toLocaleString('zh-CN'), comments: [], likes: 0 });
-            input.value = ''; await updateCloud({ ...data.record, notes });
+            const data = await res.json(); 
+            let notes = data.record.notes || [];
+            
+            const newNote = {
+                author: currentUser,
+                content: content || '',
+                time: new Date().toLocaleString('zh-CN'),
+                comments: [],
+                likes: 0
+            };
+            
+            // 如果有图片，存储压缩后的base64数组
+            if (compressedImages.length > 0) {
+                newNote.images = compressedImages;
+            }
+            
+            notes.push(newNote);
+            
+            await updateCloud({ ...data.record, notes });
+            
+            // 清空输入
+            document.getElementById('msgInput').value = '';
+            clearImages();
+            
+            showAuthError("✅ 动态发布成功");
+            setTimeout(hideAuthError, 2000);
         }
         async function saveSettingsToCloud() {
             const res = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.BIN}/latest`, { headers: { "X-Master-Key": CONFIG.KEY }});
@@ -2288,7 +2643,8 @@
                 reviewBadge.innerText = reviewMode ? '开启' : '关闭';
                 reviewBadge.style.background = reviewMode ? '#4caf50' : '#ff9800';
                 
-                // 用户列表在展开时会自动渲染
+                renderUserList();
+                
                 updatePreview();
                 document.getElementById('devModal').style.display = 'block'; 
             } else { 
