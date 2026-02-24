@@ -214,6 +214,106 @@
             cursor: pointer;
         }
 
+        /* 我的动态历史样式 */
+        .history-section {
+            background: #f0f7fa;
+            padding: 10px;
+            border-radius: 10px;
+            margin: 15px 0 15px 0;
+        }
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+        .history-header:hover {
+            background: rgba(0,0,0,0.05);
+        }
+        .history-header-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .history-icon {
+            font-size: 14px;
+        }
+        .history-title {
+            font-size: 11px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .history-count {
+            background: var(--main);
+            color: white;
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 12px;
+        }
+        .history-arrow {
+            font-size: 12px;
+            color: #666;
+            transition: transform 0.3s;
+        }
+        .history-arrow.expanded {
+            transform: rotate(90deg);
+        }
+        .history-list-container {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-in-out, opacity 0.2s ease-in-out, margin 0.3s ease-in-out;
+            margin-top: 0;
+        }
+        .history-list-container.expanded {
+            max-height: 300px;
+            opacity: 1;
+            margin-top: 10px;
+            overflow-y: auto;
+        }
+        .history-search {
+            width: 100%;
+            padding: 6px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 11px;
+            box-sizing: border-box;
+            margin-bottom: 8px;
+        }
+        .history-item {
+            background: white;
+            padding: 8px 10px;
+            border-radius: 6px;
+            margin-bottom: 5px;
+            border-left: 2px solid var(--main);
+            font-size: 11px;
+        }
+        .history-item-content {
+            color: #333;
+            word-break: break-word;
+            margin-bottom: 4px;
+        }
+        .history-item-time {
+            color: #999;
+            font-size: 9px;
+        }
+        .history-item-image {
+            max-width: 50px;
+            max-height: 50px;
+            border-radius: 4px;
+            margin-top: 4px;
+            cursor: pointer;
+        }
+        .history-empty {
+            text-align: center;
+            color: #999;
+            padding: 10px;
+            font-size: 11px;
+        }
+
         /* 动态卡片 - 支持多图显示 */
         .card { 
             background: rgba(255,255,255,0.9); 
@@ -338,25 +438,20 @@
             box-sizing: border-box;
         }
 
-        /* 多图上传区域 */
-        .image-upload-container {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 8px;
-            flex-wrap: wrap;
-        }
+        /* 图片上传按钮样式（新布局用） */
         .image-upload-btn {
             background: #f0f0f0;
             color: #666;
             border: none;
             border-radius: 6px;
-            padding: 6px 10px;
+            padding: 8px 12px;
             font-size: 12px;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 4px;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
         .image-upload-btn:hover {
             background: #e0e0e0;
@@ -1200,6 +1295,22 @@
             </div>
         </div>
 
+        <!-- 新增：我的动态历史区域 -->
+        <div class="history-section" id="historySection" style="display: none;">
+            <div class="history-header" onclick="toggleUserHistory()">
+                <div class="history-header-left">
+                    <span class="history-icon">📜</span>
+                    <span class="history-title">我的动态历史</span>
+                    <span class="history-count" id="userHistoryCount">0</span>
+                </div>
+                <span class="history-arrow" id="historyArrow">▶</span>
+            </div>
+            <div class="history-list-container" id="historyListContainer">
+                <input type="text" id="historySearchInput" class="history-search" placeholder="搜索我的动态..." oninput="filterUserHistory()">
+                <div id="userHistoryList"></div>
+            </div>
+        </div>
+
         <button class="btn" style="background:#444; color:white; width:100%; margin-top:15px; padding:8px; font-size:12px" onclick="showDevAuth()">🛠️ 开发者模式</button>
         <div id="devAuthArea" style="display:none; margin-top:8px">
             <input type="password" id="devPassInput" style="width:100%; padding:6px; border-radius:6px; border:1px solid #ddd; box-sizing:border-box" placeholder="口令">
@@ -1210,7 +1321,7 @@
     <div id="devModal">
         <h3 style="margin:0 0 15px; text-align:center; font-size:16px">🛠️ 开发者配置</h3>
         
-        <!-- 注册审核开关 - 开启后新用户需要审核才能登录 -->
+        <!-- 注册审核开关 -->
         <div style="background:#e0f0e0; padding:10px; border-radius:10px; margin-bottom:15px">
             <label style="font-size:11px; font-weight:bold">🔐 注册审核</label>
             <div class="review-switch">
@@ -1224,11 +1335,11 @@
                 </label>
             </div>
             <div style="font-size:10px; color:#666; margin-top:5px; padding:0 5px;">
-                开启后新用户注册需要管理员审核通过才能登录，未同意的账号将被自动删除
+                开启后新用户注册需要管理员审核通过才能登录
             </div>
         </div>
 
-        <!-- 用户身份管理 - 包含审核和永久删除功能，增加搜索框 -->
+        <!-- 用户身份管理 -->
         <div class="identity-manager">
             <div class="identity-header" onclick="toggleIdentityList()">
                 <div class="identity-header-left">
@@ -1324,15 +1435,15 @@
     <div class="container">
         <div id="status">连接中...</div>
         <div class="input-card">
-            <!-- 多图上传区域 -->
-            <div class="image-upload-container">
+            <!-- 新布局：按钮在左侧，输入框在右侧 -->
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
                 <input type="file" id="imageInput" accept="image/*" multiple style="display:none" onchange="handleImageSelect(event)">
                 <button class="image-upload-btn" onclick="document.getElementById('imageInput').click()">
-                    <span>📷</span> 选择图片 (最多3张)
+                    <span>📷</span> 图片
                 </button>
-                <div class="image-previews" id="imagePreviews"></div>
+                <textarea id="msgInput" placeholder="分享动态..." style="flex:1; height:40px; margin-bottom:0;"></textarea>
             </div>
-            <textarea id="msgInput" placeholder="在此分享你的动态..."></textarea>
+            <div class="image-previews" id="imagePreviews"></div>
             <div class="btn-group">
                 <button class="btn btn-pub" onclick="publish()">发布</button>
                 <button class="btn btn-refresh" onclick="loadData()"><span id="refreshIcon">↻</span></button>
@@ -1374,10 +1485,12 @@
         let reviewMode = false;
         let userBadges = {};
         let userStatus = {};
-        let currentSearchTerm = ''; // 当前搜索词
+        let currentSearchTerm = ''; // 当前用户管理搜索词
         let selectedImages = []; // 存储选择的图片文件 { file, preview }
+        let notes = []; // 存储所有动态
+        let userHistorySearchTerm = ''; // 历史记录搜索词
 
-        // 图片压缩函数（大幅压缩以符合JSONBin大小限制）
+        // 图片压缩函数
         function compressImage(file, maxWidth = 400, maxHeight = 400, quality = 0.6) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -1390,7 +1503,6 @@
                         let width = img.width;
                         let height = img.height;
                         
-                        // 计算缩放比例
                         if (width > height) {
                             if (width > maxWidth) {
                                 height *= maxWidth / width;
@@ -1408,7 +1520,6 @@
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
                         
-                        // 压缩为JPEG格式，低质量
                         canvas.toBlob((blob) => {
                             const compressedFile = new File([blob], file.name, {
                                 type: 'image/jpeg',
@@ -1434,16 +1545,12 @@
                 showAuthError("最多只能选择3张图片");
                 return;
             }
-            
-            // 检查每个文件大小（压缩前限制在5MB以内）
             for (let file of files) {
                 if (file.size > 5 * 1024 * 1024) {
                     showAuthError("单张图片不能超过5MB");
                     return;
                 }
             }
-            
-            // 读取预览
             for (let file of files) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
@@ -1457,7 +1564,6 @@
             }
         }
 
-        // 渲染图片预览
         function renderImagePreviews() {
             const container = document.getElementById('imagePreviews');
             container.innerHTML = '';
@@ -1472,19 +1578,16 @@
             });
         }
 
-        // 移除图片
         function removeImage(index) {
             selectedImages.splice(index, 1);
             renderImagePreviews();
         }
 
-        // 清空所有图片
         function clearImages() {
             selectedImages = [];
             renderImagePreviews();
         }
 
-        // 显示图片查看器
         function showImageViewer(imageUrl) {
             const container = document.getElementById('imageViewerContainer');
             container.innerHTML = `
@@ -1509,7 +1612,6 @@
             const container = document.getElementById('welcomeContainer');
             const hours = new Date().getHours();
             let greeting = '';
-            
             if (hours < 12) {
                 greeting = '早上好';
             } else if (hours < 18) {
@@ -1517,9 +1619,7 @@
             } else {
                 greeting = '晚上好';
             }
-            
             const username = currentUser || '朋友';
-            
             container.innerHTML = `
                 <div class="welcome-overlay">
                     <div class="welcome-content">
@@ -1529,8 +1629,6 @@
                     </div>
                 </div>
             `;
-            
-            // 2秒后自动移除欢迎标语
             setTimeout(() => {
                 container.innerHTML = '';
             }, 2000);
@@ -1547,7 +1645,6 @@
                 onConfirm,
                 onCancel
             } = options;
-
             const container = document.getElementById('modalContainer');
             container.innerHTML = `
                 <div class="custom-modal-overlay" onclick="if(event.target===this) closeModal()">
@@ -1578,7 +1675,6 @@
             const badge = document.getElementById('reviewModeBadge');
             badge.innerText = reviewMode ? '开启' : '关闭';
             badge.style.background = reviewMode ? '#4caf50' : '#ff9800';
-            
             if (document.getElementById('identityList').classList.contains('expanded')) {
                 renderUserList();
             }
@@ -1588,7 +1684,6 @@
         function toggleIdentityList() {
             const list = document.getElementById('identityList');
             const arrow = document.getElementById('identityArrow');
-            
             if (list.classList.contains('expanded')) {
                 list.classList.remove('expanded');
                 arrow.classList.remove('expanded');
@@ -1613,52 +1708,42 @@
             renderUserList();
         }
 
-        // 清除搜索
         function clearUserSearch() {
             document.getElementById('userSearchInput').value = '';
             currentSearchTerm = '';
             renderUserList();
         }
 
-        // 渲染用户列表
         function renderUserList() {
             const container = document.getElementById('userListContainer');
             const userCount = document.getElementById('userCount');
-            
             if (!users || users.length === 0) {
                 container.innerHTML = '<div style="text-align:center; padding:10px; color:#999">暂无用户</div>';
                 userCount.innerText = '0';
                 return;
             }
-            
-            // 过滤用户
             let filteredUsers = users;
             if (currentSearchTerm) {
                 filteredUsers = users.filter(user => 
                     user.username.toLowerCase().includes(currentSearchTerm)
                 );
             }
-            
             userCount.innerText = filteredUsers.length;
-            
             if (filteredUsers.length === 0) {
                 container.innerHTML = '<div style="text-align:center; padding:10px; color:#999">未找到匹配的用户</div>';
                 return;
             }
-            
             let html = '';
             filteredUsers.forEach(user => {
                 const badge = userBadges[user.username] || '普通用户';
                 const status = userStatus[user.username] || 'approved';
                 const createdDate = user.createdAt ? new Date(user.createdAt).toLocaleDateString() : '未知';
-                
                 let statusHtml = '';
                 if (status === 'pending') {
                     statusHtml = '<span class="identity-status">待审核</span>';
                 } else if (status === 'approved') {
                     statusHtml = '<span class="identity-status approved">已通过</span>';
                 }
-                
                 html += `
                     <div class="identity-item">
                         <div class="identity-user">
@@ -1685,7 +1770,6 @@
                     </div>
                 `;
             });
-            
             container.innerHTML = html;
         }
 
@@ -1702,23 +1786,18 @@
         // 通过用户审核
         async function approveUser(username) {
             userStatus[username] = 'approved';
-            
             try {
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.BIN}/latest`, { 
                     headers: { "X-Master-Key": CONFIG.KEY }
                 });
                 const data = await res.json();
-                
                 const updatedRecord = {
                     ...data.record,
                     userStatus: userStatus
                 };
-                
                 await updateCloud(updatedRecord);
-                
                 showAuthError(`✅ 已通过用户 ${username} 的审核，该用户可以登录了`);
                 setTimeout(hideAuthError, 3000);
-                
                 renderUserList();
             } catch (e) {
                 showAuthError("❌ 操作失败，请重试");
@@ -1730,10 +1809,8 @@
         async function deleteUserPermanently(username) {
             try {
                 users = users.filter(u => u.username !== username);
-                
                 delete userBadges[username];
                 delete userStatus[username];
-                
                 if (window.signatureData && window.signatureData.owner === username) {
                     window.signatureData = null;
                 }
@@ -1741,14 +1818,12 @@
                     currentSignature = "✨ 这个人很懒，还没有签名~";
                     signatureOwner = null;
                 }
-                
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.BIN}/latest`, { 
                     headers: { "X-Master-Key": CONFIG.KEY }
                 });
                 const data = await res.json();
-                let notes = data.record.notes || [];
-                
-                notes = notes.map(note => {
+                let notesData = data.record.notes || [];
+                notesData = notesData.map(note => {
                     if (note.author === username) {
                         return null;
                     }
@@ -1757,25 +1832,20 @@
                     }
                     return note;
                 }).filter(note => note !== null);
-                
                 const updatedRecord = {
                     ...data.record,
                     users: users,
                     userBadges: userBadges,
                     userStatus: userStatus,
-                    notes: notes,
+                    notes: notesData,
                     signature: window.signatureData
                 };
-                
                 await updateCloud(updatedRecord);
-                
                 showAuthError(`✅ 已永久删除用户 ${username} 及其所有相关内容`);
                 setTimeout(hideAuthError, 3000);
-                
                 if (currentUser === username) {
                     logout();
                 }
-                
                 renderUserList();
             } catch (e) {
                 showAuthError("❌ 删除失败，请重试");
@@ -1787,62 +1857,48 @@
         async function saveUserBadge(username) {
             const input = document.getElementById(`badge-${username}`);
             const newBadge = input.value.trim() || '普通用户';
-            
             userBadges[username] = newBadge;
-            
             try {
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.BIN}/latest`, { 
                     headers: { "X-Master-Key": CONFIG.KEY }
                 });
                 const data = await res.json();
-                
                 const updatedBadges = {
                     ...(data.record.userBadges || {}),
                     [username]: newBadge
                 };
-                
                 const updatedRecord = {
                     ...data.record,
                     userBadges: updatedBadges
                 };
-                
                 await updateCloud(updatedRecord);
-                
                 showAuthError(`✅ 已将 ${username} 的身份永久改为 "${newBadge}"，所有人可见`);
                 setTimeout(hideAuthError, 3000);
-                
                 await loadData();
-                
             } catch (e) {
                 showAuthError("❌ 保存失败，请重试");
                 setTimeout(hideAuthError, 2000);
             }
         }
 
-        // 获取用户身份标签
         function getUserBadge(username) {
             return userBadges[username] || '普通用户';
         }
 
-        // 检查用户是否可以登录
         function canUserLogin(username) {
             if (!reviewMode) return true;
             const status = userStatus[username];
             return status === 'approved';
         }
 
-        // 显示用户信息弹窗
         function showUserProfile(username) {
             let userSignature = "这个人还没有设置签名~";
-            
             if (window.signatureData && window.signatureData.owner === username) {
                 userSignature = window.signatureData.content;
             } else if (signatureOwner === username) {
                 userSignature = currentSignature;
             }
-            
             const badge = getUserBadge(username);
-            
             const container = document.getElementById('userProfileContainer');
             container.innerHTML = `
                 <div class="user-profile-overlay" onclick="if(event.target===this) this.remove()">
@@ -1872,7 +1928,6 @@
                     </div>
                 </div>
             `;
-            
             loadUserStats(username).then(stats => {
                 const postCountEl = document.getElementById('userPostCount');
                 const commentCountEl = document.getElementById('userCommentCount');
@@ -1881,25 +1936,21 @@
             });
         }
 
-        // 加载用户统计信息
         async function loadUserStats(username) {
             try {
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.BIN}/latest?v=${Date.now()}`, { 
                     headers: { "X-Master-Key": CONFIG.KEY }
                 });
                 const d = await res.json();
-                const notes = d.record.notes || [];
-                
+                const notesData = d.record.notes || [];
                 let postCount = 0;
                 let commentCount = 0;
-                
-                notes.forEach(note => {
+                notesData.forEach(note => {
                     if (note.author === username) postCount++;
                     (note.comments || []).forEach(comment => {
                         if (comment.user === username) commentCount++;
                     });
                 });
-                
                 return { posts: postCount, comments: commentCount };
             } catch (e) {
                 console.error('加载用户统计失败', e);
@@ -1907,7 +1958,6 @@
             }
         }
 
-        // 显示删除确认弹窗
         function showDeleteConfirm(message, onConfirm) {
             showModal({
                 title: '确认删除',
@@ -1930,7 +1980,6 @@
                 this.vx = (Math.random() - 0.5) * 4;
                 this.vy = (Math.random() - 0.5) * 4 - 2;
             }
-
             update() {
                 this.x += this.vx;
                 this.y += this.vy;
@@ -1938,14 +1987,11 @@
                 this.age++;
                 return this.age < this.maxAge;
             }
-
             draw(ctx) {
                 const opacity = 1 - (this.age / this.maxAge);
                 ctx.globalAlpha = opacity;
                 ctx.fillStyle = this.color;
-                
                 const currentSize = this.size * (1 - this.age / this.maxAge * 0.5);
-                
                 ctx.beginPath();
                 if (this.shape === 'circle') {
                     ctx.arc(this.x, this.y, currentSize / 2, 0, Math.PI * 2);
@@ -1963,23 +2009,19 @@
             }
         }
 
-        // 初始化点击特效
         function initClickEffect() {
             const canvas = document.getElementById('clickCanvas');
             const ctx = canvas.getContext('2d');
-            
             function resizeCanvas() {
                 canvas.width = window.innerWidth;
                 canvas.height = window.innerHeight;
             }
             resizeCanvas();
             window.addEventListener('resize', resizeCanvas);
-
             document.addEventListener('click', (e) => {
                 if (e.target.closest('#devModal') || e.target.closest('#sidePanel') || e.target.closest('.btn')) {
                     return;
                 }
-                
                 const particleCount = 5 + Math.floor(Math.random() * 4);
                 for (let i = 0; i < particleCount; i++) {
                     particles.push(new Particle(
@@ -1991,7 +2033,6 @@
                     ));
                 }
             });
-
             function animate() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 particles = particles.filter(p => p.update());
@@ -2013,11 +2054,9 @@
             const color = document.getElementById('effectColor').value;
             const size = document.getElementById('effectSize').value;
             const shape = document.querySelector('.shape-option.selected')?.dataset.shape || 'circle';
-            
             const preview = document.getElementById('previewShape');
             preview.style.setProperty('--preview-color', color);
             preview.style.setProperty('--preview-size', size + 'px');
-            
             if (shape === 'circle') {
                 preview.style.borderRadius = '50%';
                 preview.style.background = color;
@@ -2077,12 +2116,10 @@
                     headers: { "X-Master-Key": CONFIG.KEY }
                 });
                 const data = await res.json();
-                
                 const updatedRecord = {
                     ...data.record,
                     users: updatedUsers
                 };
-                
                 await updateCloud(updatedRecord);
                 return true;
             } catch (e) {
@@ -2093,10 +2130,8 @@
 
         async function handleRegister() {
             hideAuthError();
-            
             const n = document.getElementById('uName').value.trim();
             const p = document.getElementById('uPass').value;
-
             if(!n) { 
                 showAuthError("请输入昵称"); 
                 return; 
@@ -2105,29 +2140,21 @@
                 showAuthError("密码不能少于 6 个字符"); 
                 return; 
             }
-            
             await loadUsers();
-            
             const existingUser = users.find(u => u.username === n);
             if (existingUser) {
                 showAuthError("❌ 用户名已存在，请直接登录或使用其他昵称");
                 return;
             }
-            
-            // 新用户状态：如果需要审核则为pending，否则为approved
             const newUserStatus = reviewMode ? 'pending' : 'approved';
             userStatus[n] = newUserStatus;
-            
             users.push({
                 username: n,
                 password: p,
                 createdAt: new Date().toISOString()
             });
-            
             userBadges[n] = '普通用户';
-            
             const success = await saveUsers(users);
-            
             if (success) {
                 if (reviewMode) {
                     showAuthError("✅ 注册成功！请等待管理员审核，未通过审核的账号将被自动删除");
@@ -2142,10 +2169,8 @@
 
         async function handleLogin() {
             hideAuthError();
-            
             const n = document.getElementById('uName').value.trim();
             const p = document.getElementById('uPass').value;
-
             if(!n) { 
                 showAuthError("请输入昵称"); 
                 return; 
@@ -2154,21 +2179,16 @@
                 showAuthError("密码不能少于 6 个字符"); 
                 return; 
             }
-            
             await loadUsers();
-            
             const user = users.find(u => u.username === n);
-            
             if (!user) {
                 showAuthError("❌ 未注册，请先注册");
                 return;
             }
-            
             if (user.password !== p) {
                 showAuthError("❌ 密码错误");
                 return;
             }
-            
             if (!canUserLogin(n)) {
                 const status = userStatus[n];
                 if (status === 'pending') {
@@ -2178,16 +2198,13 @@
                 }
                 return;
             }
-            
             currentUser = n; 
             localStorage.setItem('sister_user', n); 
             updateUserUI();
             updateSignatureOwner();
             hideAuthError();
             showAuthError("✅ 登录成功！");
-            
             await loadData();
-            
             setTimeout(hideAuthError, 3000);
         }
 
@@ -2262,16 +2279,16 @@
                     signatureOwner = null;
                 }
                 
+                notes = d.record.notes || [];
                 applyStyles(d.record.settings); 
-                render(d.record.notes || []);
+                render(notes);
                 
                 if (d.record.users) {
                     users = d.record.users;
                 }
                 
-                // 更新计数但不重新渲染，避免覆盖搜索状态
+                // 更新用户管理计数
                 if (document.getElementById('identityList').classList.contains('expanded')) {
-                    // 只更新计数，不重新渲染列表
                     const filteredCount = currentSearchTerm ? 
                         users.filter(u => u.username.toLowerCase().includes(currentSearchTerm)).length : 
                         users.length;
@@ -2280,6 +2297,9 @@
                     document.getElementById('userCount').innerText = users.length;
                 }
                 
+                // 更新我的动态历史
+                updateUserHistorySection();
+                
                 document.getElementById('signatureDisplay').innerText = currentSignature;
                 document.getElementById('signatureInput').value = currentSignature;
                 
@@ -2287,6 +2307,79 @@
                 document.getElementById('status').innerText = "✨ 空间已刷新";
             } catch (e) { }
             setTimeout(() => icon.classList.remove('rotating'), 500);
+        }
+
+        // 我的动态历史相关函数
+        function updateUserHistorySection() {
+            const section = document.getElementById('historySection');
+            if (currentUser) {
+                section.style.display = 'block';
+                renderUserHistory();
+            } else {
+                section.style.display = 'none';
+            }
+        }
+
+        function toggleUserHistory() {
+            const container = document.getElementById('historyListContainer');
+            const arrow = document.getElementById('historyArrow');
+            if (container.classList.contains('expanded')) {
+                container.classList.remove('expanded');
+                arrow.classList.remove('expanded');
+            } else {
+                container.classList.add('expanded');
+                arrow.classList.add('expanded');
+                // 每次展开时重新渲染，确保数据最新
+                renderUserHistory();
+            }
+        }
+
+        function filterUserHistory() {
+            const input = document.getElementById('historySearchInput');
+            userHistorySearchTerm = input.value.toLowerCase().trim();
+            renderUserHistory();
+        }
+
+        function renderUserHistory() {
+            const listContainer = document.getElementById('userHistoryList');
+            const countSpan = document.getElementById('userHistoryCount');
+            if (!currentUser) {
+                listContainer.innerHTML = '<div class="history-empty">请先登录</div>';
+                countSpan.innerText = '0';
+                return;
+            }
+            // 过滤当前用户的动态
+            let userNotes = notes.filter(note => note.author === currentUser);
+            // 按时间倒序
+            userNotes.sort((a, b) => new Date(b.time) - new Date(a.time));
+            // 应用搜索过滤
+            if (userHistorySearchTerm) {
+                userNotes = userNotes.filter(note => 
+                    note.content.toLowerCase().includes(userHistorySearchTerm)
+                );
+            }
+            countSpan.innerText = userNotes.length;
+            if (userNotes.length === 0) {
+                listContainer.innerHTML = '<div class="history-empty">暂无动态</div>';
+                return;
+            }
+            let html = '';
+            userNotes.forEach(note => {
+                // 简单显示内容预览
+                let preview = note.content.length > 30 ? note.content.substring(0, 30) + '...' : note.content;
+                let imageHtml = '';
+                if (note.images && note.images.length > 0) {
+                    imageHtml = `<img src="${note.images[0]}" class="history-item-image" onclick="showImageViewer('${note.images[0]}')">`;
+                }
+                html += `
+                    <div class="history-item">
+                        <div class="history-item-content">${preview}</div>
+                        <div class="history-item-time">${note.time}</div>
+                        ${imageHtml}
+                    </div>
+                `;
+            });
+            listContainer.innerHTML = html;
         }
 
         function applyStyles(s) {
@@ -2306,29 +2399,23 @@
                 showAuthError("请先登录");
                 return;
             }
-            
             try {
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.BIN}/latest`, { 
                     headers: { "X-Master-Key": CONFIG.KEY }
                 });
                 const data = await res.json();
-                let notes = data.record.notes || [];
-                
-                if (!notes[noteIdx]) {
+                let notesData = data.record.notes || [];
+                if (!notesData[noteIdx]) {
                     showAuthError("动态不存在");
                     return;
                 }
-                
-                const post = notes[noteIdx];
-                
+                const post = notesData[noteIdx];
                 if (post.author !== currentUser) {
                     showAuthError("只能删除自己的动态");
                     return;
                 }
-                
-                notes.splice(noteIdx, 1);
-                
-                await updateCloud({ ...data.record, notes });
+                notesData.splice(noteIdx, 1);
+                await updateCloud({ ...data.record, notes: notesData });
                 showAuthError("✅ 动态已删除");
                 setTimeout(hideAuthError, 2000);
             } catch (e) {
@@ -2336,15 +2423,12 @@
             }
         }
 
-        function render(notes) {
+        function render(notesData) {
             const list = document.getElementById('msgList'); list.innerHTML = '';
-            [...notes].map((n, i) => ({...n, rIdx: i})).reverse().forEach(note => {
+            [...notesData].map((n, i) => ({...n, rIdx: i})).reverse().forEach(note => {
                 const div = document.createElement('div'); div.className = 'card';
-                
                 const canDeletePost = currentUser && note.author === currentUser;
                 const authorBadge = getUserBadge(note.author);
-                
-                // 处理多图显示
                 let imagesHtml = '';
                 if (note.images && note.images.length > 0) {
                     imagesHtml = '<div class="post-images">';
@@ -2353,11 +2437,9 @@
                     });
                     imagesHtml += '</div>';
                 }
-                
                 const comms = (note.comments || []).map((c, ci) => {
                     const canDeleteComment = currentUser && c.user === currentUser;
                     const commenterBadge = getUserBadge(c.user);
-                    
                     return `
                         <div class="comment-item">
                             <div class="comment-content">
@@ -2371,7 +2453,6 @@
                         </div>
                     `;
                 }).join('');
-                
                 div.innerHTML = `
                     <div class="card-header">
                         <div class="card-header-left">
@@ -2404,29 +2485,23 @@
                 showAuthError("请先登录");
                 return;
             }
-            
             try {
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.BIN}/latest`, { 
                     headers: { "X-Master-Key": CONFIG.KEY }
                 });
                 const data = await res.json();
-                let notes = data.record.notes || [];
-                
-                if (!notes[noteIdx] || !notes[noteIdx].comments || !notes[noteIdx].comments[commentIdx]) {
+                let notesData = data.record.notes || [];
+                if (!notesData[noteIdx] || !notesData[noteIdx].comments || !notesData[noteIdx].comments[commentIdx]) {
                     showAuthError("评论不存在");
                     return;
                 }
-                
-                const comment = notes[noteIdx].comments[commentIdx];
-                
+                const comment = notesData[noteIdx].comments[commentIdx];
                 if (comment.user !== currentUser) {
                     showAuthError("只能删除自己的评论");
                     return;
                 }
-                
-                notes[noteIdx].comments.splice(commentIdx, 1);
-                
-                await updateCloud({ ...data.record, notes });
+                notesData[noteIdx].comments.splice(commentIdx, 1);
+                await updateCloud({ ...data.record, notes: notesData });
                 showAuthError("✅ 评论已删除");
                 setTimeout(hideAuthError, 2000);
             } catch (e) {
@@ -2439,11 +2514,9 @@
                 showAuthError('请先登录后再编辑签名');
                 return;
             }
-            
             const display = document.getElementById('signatureDisplay');
             const editArea = document.getElementById('signatureEditArea');
             const input = document.getElementById('signatureInput');
-            
             if (editArea.style.display === 'none' || !editArea.style.display) {
                 display.style.display = 'none';
                 editArea.style.display = 'block';
@@ -2467,38 +2540,31 @@
                 showAuthError('请先登录后再保存签名');
                 return;
             }
-            
             const newSignature = document.getElementById('signatureInput').value.trim();
             if (!newSignature) {
                 showAuthError('签名不能为空');
                 return;
             }
-
             try {
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.BIN}/latest`, { 
                     headers: { "X-Master-Key": CONFIG.KEY }
                 });
                 const data = await res.json();
-                
                 const signatureData = {
                     content: newSignature,
                     owner: currentUser,
                     updatedAt: new Date().toISOString()
                 };
-                
                 const updatedRecord = {
                     ...data.record,
                     signature: signatureData
                 };
-                
                 await updateCloud(updatedRecord);
-                
                 currentSignature = newSignature;
                 signatureOwner = currentUser;
                 document.getElementById('signatureDisplay').innerText = newSignature;
                 updateSignatureOwner();
                 cancelSignatureEdit();
-                
                 showAuthError("✨ 签名已保存到云端");
                 setTimeout(hideAuthError, 3000);
             } catch (e) {
@@ -2508,10 +2574,10 @@
 
         async function handleLike(nIdx, cIdx = null) {
             const res = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.BIN}/latest`, { headers: { "X-Master-Key": CONFIG.KEY }});
-            const data = await res.json(); let notes = data.record.notes || [];
-            if (cIdx === null) notes[nIdx].likes = (notes[nIdx].likes || 0) + 1;
-            else notes[nIdx].comments[cIdx].likes = (notes[nIdx].comments[cIdx].likes || 0) + 1;
-            await updateCloud({ ...data.record, notes });
+            const data = await res.json(); let notesData = data.record.notes || [];
+            if (cIdx === null) notesData[nIdx].likes = (notesData[nIdx].likes || 0) + 1;
+            else notesData[nIdx].comments[cIdx].likes = (notesData[nIdx].comments[cIdx].likes || 0) + 1;
+            await updateCloud({ ...data.record, notes: notesData });
         }
         async function submitComment(idx) {
             if(!currentUser) {
@@ -2521,10 +2587,10 @@
             }
             const val = document.getElementById(`comment-input-${idx}`).value.trim(); if(!val) return;
             const res = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.BIN}/latest`, { headers: { "X-Master-Key": CONFIG.KEY }});
-            const data = await res.json(); let notes = data.record.notes || [];
-            if(!notes[idx].comments) notes[idx].comments = [];
-            notes[idx].comments.push({ user: currentUser, content: val, likes: 0 });
-            await updateCloud({ ...data.record, notes });
+            const data = await res.json(); let notesData = data.record.notes || [];
+            if(!notesData[idx].comments) notesData[idx].comments = [];
+            notesData[idx].comments.push({ user: currentUser, content: val, likes: 0 });
+            await updateCloud({ ...data.record, notes: notesData });
         }
         async function publish() {
             if(!currentUser) {
@@ -2532,25 +2598,20 @@
                 setTimeout(hideAuthError, 3000);
                 return;
             }
-            
             const content = document.getElementById('msgInput').value.trim();
             if (!content && selectedImages.length === 0) {
                 showAuthError("请输入内容或选择图片");
                 return;
             }
-            
-            // 压缩所有图片
             showAuthError("正在压缩图片...");
             const compressedImages = [];
             for (let img of selectedImages) {
                 const compressed = await compressImage(img.file);
                 compressedImages.push(compressed);
             }
-            
             const res = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.BIN}/latest`, { headers: { "X-Master-Key": CONFIG.KEY }});
             const data = await res.json(); 
-            let notes = data.record.notes || [];
-            
+            let notesData = data.record.notes || [];
             const newNote = {
                 author: currentUser,
                 content: content || '',
@@ -2558,20 +2619,13 @@
                 comments: [],
                 likes: 0
             };
-            
-            // 如果有图片，存储压缩后的base64数组
             if (compressedImages.length > 0) {
                 newNote.images = compressedImages;
             }
-            
-            notes.push(newNote);
-            
-            await updateCloud({ ...data.record, notes });
-            
-            // 清空输入
+            notesData.push(newNote);
+            await updateCloud({ ...data.record, notes: notesData });
             document.getElementById('msgInput').value = '';
             clearImages();
-            
             showAuthError("✅ 动态发布成功");
             setTimeout(hideAuthError, 2000);
         }
@@ -2580,11 +2634,9 @@
             const data = await res.json(); const s = data.record.settings || DEFAULT_S;
             const v = document.getElementById('devVer').value; const n = document.getElementById('devNotice').value;
             if(v && n && v !== s.currentVer) { s.history.push({ ver: s.currentVer, text: s.notice }); s.currentVer = v; s.notice = n; }
-            
             const effectColor = document.getElementById('effectColor').value;
             const effectSize = parseInt(document.getElementById('effectSize').value);
             const effectShape = document.querySelector('.shape-option.selected')?.dataset.shape || 'circle';
-            
             const upd = { 
                 ...s, 
                 theme: document.getElementById('themeColor').value, 
@@ -2592,21 +2644,17 @@
                 bgImg: document.getElementById('bgUrl').value, 
                 radius: document.getElementById('radiusRange').value 
             };
-            
             const effectSettings = {
                 color: effectColor,
                 size: effectSize,
                 shape: effectShape
             };
-            
             const signatureData = currentSignature ? {
                 content: currentSignature,
                 owner: signatureOwner || currentUser || 'unknown',
                 updatedAt: new Date().toISOString()
             } : null;
-            
             const reviewModeState = document.getElementById('reviewModeToggle').checked;
-            
             await updateCloud({ 
                 ...data.record, 
                 settings: upd, 
@@ -2628,7 +2676,6 @@
                 document.getElementById('effectColor').value = effectSettings.color;
                 document.getElementById('effectSize').value = effectSettings.size;
                 document.getElementById('effectSizeVal').innerText = effectSettings.size + 'px';
-                
                 document.querySelectorAll('.shape-option').forEach(opt => {
                     if (opt.dataset.shape === effectSettings.shape) {
                         opt.classList.add('selected');
@@ -2636,15 +2683,12 @@
                         opt.classList.remove('selected');
                     }
                 });
-                
                 const reviewToggle = document.getElementById('reviewModeToggle');
                 reviewToggle.checked = reviewMode;
                 const reviewBadge = document.getElementById('reviewModeBadge');
                 reviewBadge.innerText = reviewMode ? '开启' : '关闭';
                 reviewBadge.style.background = reviewMode ? '#4caf50' : '#ff9800';
-                
                 renderUserList();
-                
                 updatePreview();
                 document.getElementById('devModal').style.display = 'block'; 
             } else { 
@@ -2657,6 +2701,8 @@
             updateUserUI(); 
             updateSignatureOwner();
             hideAuthError();
+            // 更新历史区域显示
+            updateUserHistorySection();
             loadData();
         }
         function updateUserUI() { 
@@ -2688,8 +2734,6 @@
             loadData();
             updateSignatureOwner();
             initClickEffect();
-            
-            // 显示欢迎标语
             setTimeout(() => {
                 showWelcomeBanner();
             }, 500);
