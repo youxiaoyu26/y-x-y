@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>姐姐的个人空间/貌似是最终版</title>
+    <title>姐姐的个人空间</title>
     <style id="dynamicStyle">
         :root { 
-            --main: #d4a373; 
-            --bg: #faf9f6; 
+            --main: #F2A674; 
+            --bg: #EBEBEB; 
             --radius: 12px; 
             --font: -apple-system, sans-serif;
-            --effect-color: #d4a373;
+            --effect-color: #F2A674;
             --effect-size: 30px;
             --effect-shape: circle;
         }
@@ -45,9 +45,9 @@
         .ver-badge { background: var(--main); color: white; padding: 1px 5px; border-radius: 4px; font-size: 9px; margin-bottom: 3px; display: inline-block; }
         .notice-content { font-size: 12.5px; color: #444; line-height: 1.5; }
         
-        /* 网站拥有者样式 */
+        /* 网站拥有者样式 - 修改为饭饭和创始人/柚小屿 */
         .owner-section {
-            background: rgba(212, 163, 115, 0.08);
+            background: rgba(242, 166, 116, 0.08);
             border-left: 2px solid var(--main);
             padding: 12px 12px;
             margin: 15px 0 15px 0;
@@ -140,13 +140,13 @@
             letter-spacing: 0.5px;
         }
         .signature-owner-badge {
-            background: rgba(212, 163, 115, 0.15);
+            background: rgba(242, 166, 116, 0.15);
             color: var(--main);
             font-size: 8px;
             padding: 2px 8px;
             border-radius: 20px;
             margin-left: 5px;
-            border: 1px solid rgba(212, 163, 115, 0.3);
+            border: 1px solid rgba(242, 166, 116, 0.3);
         }
         .signature-edit-btn {
             background: var(--main);
@@ -245,7 +245,7 @@
             transition: background 0.2s;
         }
         .author-name:hover {
-            background: rgba(212, 163, 115, 0.1);
+            background: rgba(242, 166, 116, 0.1);
         }
         .user-badge-display {
             background: var(--main);
@@ -345,7 +345,7 @@
             transition: background 0.2s;
         }
         .comment-author:hover {
-            background: rgba(212, 163, 115, 0.1);
+            background: rgba(242, 166, 116, 0.1);
         }
         .comment-actions {
             display: flex;
@@ -573,13 +573,17 @@
             transform: rotate(90deg);
         }
         .identity-list {
-            margin-top: 10px;
-            display: none;
-            max-height: 200px;
-            overflow-y: auto;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-in-out, opacity 0.2s ease-in-out, margin 0.3s ease-in-out;
+            margin-top: 0;
         }
         .identity-list.expanded {
-            display: block;
+            max-height: 200px;
+            opacity: 1;
+            margin-top: 10px;
+            overflow-y: auto;
         }
         .identity-item {
             background: white;
@@ -708,7 +712,7 @@
         .effect-preview-shape {
             width: var(--preview-size, 30px);
             height: var(--preview-size, 30px);
-            background: var(--preview-color, #d4a373);
+            background: var(--preview-color, #F2A674);
             border-radius: var(--preview-radius, 50%);
             animation: previewPulse 1.5s infinite;
         }
@@ -800,6 +804,48 @@
             margin-left: 5px;
         }
 
+        /* 设置分类样式 - 可折叠带动画 */
+        .settings-category {
+            background: #f5f5f5;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        .category-header {
+            background: #e0e0e0;
+            padding: 8px 12px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .category-header:hover {
+            background: #d0d0d0;
+        }
+        .category-arrow {
+            font-size: 12px;
+            transition: transform 0.3s ease-in-out;
+        }
+        .category-arrow.expanded {
+            transform: rotate(90deg);
+        }
+        .category-content {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-in-out, opacity 0.2s ease-in-out, padding 0.3s ease-in-out;
+            padding: 0 10px;
+        }
+        .category-content.expanded {
+            max-height: 500px;
+            opacity: 1;
+            padding: 10px;
+        }
+
         #devModal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 380px; background: white; z-index: 3000; padding: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); max-height: 85vh; overflow-y: auto; display: none; border-radius: 20px; }
         #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: none; z-index: 1999; backdrop-filter: blur(4px); }
         
@@ -807,7 +853,7 @@
         @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .card, .input-card, .btn, .notice-box { border-radius: var(--radius) !important; }
 
-        /* 通用弹窗样式 - 所有弹窗都直接写进页面 */
+        /* 通用弹窗样式 */
         .custom-modal-overlay {
             position: fixed;
             top: 0;
@@ -885,6 +931,61 @@
             background: var(--main);
             color: white;
         }
+
+        /* 欢迎标语样式 */
+        .welcome-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--main) 0%, #f8e3d0 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 20000;
+            animation: fadeOut 2s ease-in-out forwards;
+            pointer-events: none;
+        }
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            70% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        .welcome-content {
+            text-align: center;
+            color: white;
+            animation: scaleIn 0.5s ease;
+        }
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        .welcome-emoji {
+            font-size: 64px;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .welcome-title {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        .welcome-subtitle {
+            font-size: 18px;
+            opacity: 0.9;
+        }
     </style>
 </head>
 <body>
@@ -892,11 +993,14 @@
     <!-- 点击特效画布 -->
     <canvas id="clickCanvas"></canvas>
 
-    <!-- 通用弹窗容器 - 所有弹窗都放在这里 -->
+    <!-- 通用弹窗容器 -->
     <div id="modalContainer"></div>
 
     <!-- 用户信息弹窗容器 -->
     <div id="userProfileContainer"></div>
+
+    <!-- 欢迎标语容器 - 动态生成 -->
+    <div id="welcomeContainer"></div>
 
     <header>
         <div class="logo">姐姐的个人空间</div>
@@ -915,7 +1019,7 @@
         <span style="font-size:11px; color:var(--main); cursor:pointer; margin-top:8px; display:block" onclick="toggleHistory()">历史更新记录 ↓</span>
         <div id="historyBox" style="display:none; margin-top:10px; border-top:1px dashed #eee; padding-top:8px"></div>
 
-        <!-- 网站拥有者信息 -->
+        <!-- 网站拥有者信息 - 修改为饭饭和创始人/柚小屿 -->
         <div class="owner-section">
             <div class="owner-label">👑 网站拥有者</div>
             <div class="owner-name">
@@ -989,7 +1093,7 @@
             </div>
         </div>
 
-        <!-- 用户身份管理（包含审核和永久删除功能） -->
+        <!-- 用户身份管理 - 带动画 -->
         <div class="identity-manager">
             <div class="identity-header" onclick="toggleIdentityList()">
                 <div class="identity-header-left">
@@ -1011,59 +1115,67 @@
             <textarea id="devNotice" style="width:100%; height:40px; margin-top:4px; padding:5px; font-size:12px; box-sizing:border-box" placeholder="内容..."></textarea>
         </div>
 
-        <!-- 点击特效设置区域 -->
-        <div style="background:#fff3e0; padding:10px; border-radius:10px; margin-bottom:15px">
-            <label style="font-size:11px; font-weight:bold">✨ 点击特效设置</label>
-            
-            <!-- 特效颜色 -->
-            <div style="margin-top:8px">
-                <label style="font-size:10px; color:#666">特效颜色</label>
-                <input type="color" id="effectColor" style="width:100%; height:35px; margin-top:4px" value="#d4a373">
+        <!-- 可折叠的设置分类 - 带动画 -->
+        <div class="settings-category">
+            <div class="category-header" onclick="toggleSettingsCategory()">
+                <span class="category-arrow" id="settingsArrow">▶</span>
+                <span>⚙️ 设置</span>
             </div>
-            
-            <!-- 特效大小 -->
-            <div style="margin-top:8px">
-                <label style="font-size:10px; color:#666">特效大小: <span id="effectSizeVal">30px</span></label>
-                <input type="range" id="effectSize" min="10" max="60" value="30" style="width:100%">
-            </div>
-            
-            <!-- 特效形状选择 -->
-            <div style="margin-top:8px">
-                <label style="font-size:10px; color:#666">特效形状</label>
-                <div class="shape-selector" id="shapeSelector">
-                    <div class="shape-option selected" data-shape="circle" onclick="selectShape('circle')">⚪ 圆形</div>
-                    <div class="shape-option" data-shape="square" onclick="selectShape('square')">⬛ 方形</div>
-                    <div class="shape-option" data-shape="triangle" onclick="selectShape('triangle')">🔺 三角形</div>
+            <div class="category-content" id="settingsContent">
+                <!-- 点击特效设置区域 -->
+                <div style="background:#fff3e0; padding:10px; border-radius:10px; margin-bottom:10px">
+                    <label style="font-size:11px; font-weight:bold">✨ 点击特效设置</label>
+                    
+                    <!-- 特效颜色 -->
+                    <div style="margin-top:8px">
+                        <label style="font-size:10px; color:#666">特效颜色</label>
+                        <input type="color" id="effectColor" style="width:100%; height:35px; margin-top:4px" value="#F2A674">
+                    </div>
+                    
+                    <!-- 特效大小 -->
+                    <div style="margin-top:8px">
+                        <label style="font-size:10px; color:#666">特效大小: <span id="effectSizeVal">30px</span></label>
+                        <input type="range" id="effectSize" min="10" max="60" value="30" style="width:100%">
+                    </div>
+                    
+                    <!-- 特效形状选择 -->
+                    <div style="margin-top:8px">
+                        <label style="font-size:10px; color:#666">特效形状</label>
+                        <div class="shape-selector" id="shapeSelector">
+                            <div class="shape-option selected" data-shape="circle" onclick="selectShape('circle')">⚪ 圆形</div>
+                            <div class="shape-option" data-shape="square" onclick="selectShape('square')">⬛ 方形</div>
+                            <div class="shape-option" data-shape="triangle" onclick="selectShape('triangle')">🔺 三角形</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 特效预览 -->
+                    <div style="margin-top:8px">
+                        <label style="font-size:10px; color:#666">实时预览</label>
+                        <div class="effect-preview" id="effectPreview">
+                            <div class="effect-preview-shape" id="previewShape"></div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            
-            <!-- 特效预览 -->
-            <div style="margin-top:8px">
-                <label style="font-size:10px; color:#666">实时预览</label>
-                <div class="effect-preview" id="effectPreview">
-                    <div class="effect-preview-shape" id="previewShape"></div>
+
+                <!-- 主题设置区域 - 主色默认F2A674，背景色默认EBEBEB -->
+                <div style="background:#f0f0f0; padding:10px; border-radius:10px">
+                    <label style="font-size:11px; font-weight:bold">🎨 主题设置</label>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:8px">
+                        <div><label style="font-size:11px">主色</label><input type="color" id="themeColor" style="width:100%" value="#F2A674"></div>
+                        <div><label style="font-size:11px">背景色</label><input type="color" id="bgColor" style="width:100%" value="#EBEBEB"></div>
+                    </div>
+                    <div style="margin-top:8px"><label style="font-size:11px">背景图 URL</label><input type="text" id="bgUrl" style="width:100%; padding:5px; font-size:12px; box-sizing:border-box"></div>
+                    <div style="margin-top:8px">
+                        <label style="font-size:11px">UI 圆角: <span id="radiusVal">12px</span></label>
+                        <input type="range" id="radiusRange" min="0" max="25" style="width:100%">
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- 主题设置区域 -->
-        <div style="background:#f0f0f0; padding:10px; border-radius:10px; margin-bottom:15px">
-            <label style="font-size:11px; font-weight:bold">🎨 主题设置</label>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:8px">
-                <div><label style="font-size:11px">主色</label><input type="color" id="themeColor" style="width:100%"></div>
-                <div><label style="font-size:11px">背景色</label><input type="color" id="bgColor" style="width:100%"></div>
-            </div>
-            <div style="margin-top:8px"><label style="font-size:11px">背景图 URL</label><input type="text" id="bgUrl" style="width:100%; padding:5px; font-size:12px; box-sizing:border-box"></div>
-            <div style="margin-top:8px">
-                <label style="font-size:11px">UI 圆角: <span id="radiusVal">12px</span></label>
-                <input type="range" id="radiusRange" min="0" max="25" style="width:100%">
-            </div>
-        </div>
-
-        <!-- 操作按钮 -->
+        <!-- 操作按钮 - 已删除重置装修按钮，只保留同步发布和取消 -->
         <div style="display:flex; flex-direction:column; gap:6px; margin-top:15px">
             <button class="btn btn-pub" onclick="saveSettingsToCloud()">同步发布</button>
-            <button class="btn" style="background:#ff4d4d; color:white; padding:8px" onclick="showResetConfirm()">重置装修</button>
             <button class="btn" style="background:#eee; padding:8px" onclick="closeAll()">取消</button>
         </div>
     </div>
@@ -1086,9 +1198,10 @@
             BIN: "699c4b22ae596e708f424292",
             DEV_PASS: "作者最帅"
         };
+        // 修改默认设置：主色#F2A674，背景色#EBEBEB
         const DEFAULT_S = { 
-            theme: "#d4a373", 
-            bgCol: "#faf9f6", 
+            theme: "#F2A674", 
+            bgCol: "#EBEBEB", 
             bgImg: "", 
             font: "-apple-system, sans-serif", 
             radius: 12, 
@@ -1096,7 +1209,7 @@
             notice: "欢迎光临！", 
             history: [],
             effect: {
-                color: "#d4a373",
+                color: "#F2A674",
                 size: 30,
                 shape: "circle"
             },
@@ -1108,11 +1221,51 @@
         let currentSignature = "✨ 这个人很懒，还没有签名~";
         let signatureOwner = null;
         let users = [];
-        let effectSettings = { color: "#d4a373", size: 30, shape: "circle" };
+        let effectSettings = { color: "#F2A674", size: 30, shape: "circle" };
         let particles = [];
         let reviewMode = false;
         let userBadges = {};
         let userStatus = {};
+
+        // 切换设置分类折叠状态 - 带动画
+        function toggleSettingsCategory() {
+            const content = document.getElementById('settingsContent');
+            const arrow = document.getElementById('settingsArrow');
+            content.classList.toggle('expanded');
+            arrow.classList.toggle('expanded');
+        }
+
+        // 显示欢迎标语
+        function showWelcomeBanner() {
+            const container = document.getElementById('welcomeContainer');
+            const hours = new Date().getHours();
+            let greeting = '';
+            
+            if (hours < 12) {
+                greeting = '早上好';
+            } else if (hours < 18) {
+                greeting = '下午好';
+            } else {
+                greeting = '晚上好';
+            }
+            
+            const username = currentUser || '朋友';
+            
+            container.innerHTML = `
+                <div class="welcome-overlay">
+                    <div class="welcome-content">
+                        <div class="welcome-emoji">✨</div>
+                        <div class="welcome-title">${greeting}，${username}</div>
+                        <div class="welcome-subtitle">欢迎回来姐姐的个人空间</div>
+                    </div>
+                </div>
+            `;
+            
+            // 2秒后自动移除欢迎标语
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 2000);
+        }
 
         // 显示通用弹窗
         function showModal(options) {
@@ -1162,15 +1315,29 @@
             }
         }
 
-        // 切换用户身份列表显示
+        // 切换用户身份列表显示 - 带动画
         function toggleIdentityList() {
             const list = document.getElementById('identityList');
             const arrow = document.getElementById('identityArrow');
-            list.classList.toggle('expanded');
-            arrow.classList.toggle('expanded');
             
             if (list.classList.contains('expanded')) {
+                // 收起时先清空内容，避免动画卡顿
+                list.classList.remove('expanded');
+                arrow.classList.remove('expanded');
+                // 延迟清空内容，等待动画完成
+                setTimeout(() => {
+                    if (!list.classList.contains('expanded')) {
+                        list.innerHTML = '';
+                    }
+                }, 300);
+            } else {
+                // 展开时先渲染内容再添加类
                 renderUserList();
+                // 使用setTimeout确保内容已渲染
+                setTimeout(() => {
+                    list.classList.add('expanded');
+                    arrow.classList.add('expanded');
+                }, 10);
             }
         }
 
@@ -1456,16 +1623,6 @@
             });
         }
 
-        // 显示重置确认弹窗
-        function showResetConfirm() {
-            showModal({
-                title: '重置装修',
-                content: '确定要重置所有装修设置吗？',
-                confirmText: '确定重置',
-                onConfirm: 'resetSettings()'
-            });
-        }
-
         // 点击特效系统
         class Particle {
             constructor(x, y, color, size, shape) {
@@ -1743,7 +1900,7 @@
             const ownerSpan = document.getElementById('signatureOwner');
             if (currentUser) {
                 ownerSpan.innerText = currentUser + ' 的签名';
-                ownerSpan.style.backgroundColor = 'rgba(212, 163, 115, 0.15)';
+                ownerSpan.style.backgroundColor = 'rgba(242, 166, 116, 0.15)';
             } else {
                 ownerSpan.innerText = '未登录';
                 ownerSpan.style.backgroundColor = '#f0f0f0';
@@ -2107,28 +2264,6 @@
             }); 
             closeAll();
         }
-        async function resetSettings() { 
-            const res = await fetch(`https://api.jsonbin.io/v3/b/${CONFIG.BIN}/latest`, { headers: { "X-Master-Key": CONFIG.KEY }}); 
-            const data = await res.json(); 
-            
-            const signatureData = currentSignature ? {
-                content: currentSignature,
-                owner: signatureOwner || currentUser || 'unknown',
-                updatedAt: new Date().toISOString()
-            } : null;
-            
-            await updateCloud({ 
-                ...data.record, 
-                settings: DEFAULT_S, 
-                effect: DEFAULT_S.effect,
-                signature: signatureData, 
-                users: users,
-                reviewMode: false,
-                userBadges: {},
-                userStatus: {}
-            }); 
-            closeAll(); 
-        }
         function toggleHistory() { const b = document.getElementById('historyBox'); b.style.display = b.style.display === 'block' ? 'none' : 'block'; }
         function toggleMenu() { document.getElementById('sidePanel').classList.toggle('open'); document.getElementById('overlay').style.display = 'block'; updateUserUI(); updateSignatureOwner(); }
         function closeAll() { document.getElementById('devModal').style.display = 'none'; document.getElementById('sidePanel').classList.remove('open'); document.getElementById('overlay').style.display = 'none'; document.getElementById('devAuthArea').style.display='none'; }
@@ -2153,8 +2288,7 @@
                 reviewBadge.innerText = reviewMode ? '开启' : '关闭';
                 reviewBadge.style.background = reviewMode ? '#4caf50' : '#ff9800';
                 
-                renderUserList();
-                
+                // 用户列表在展开时会自动渲染
                 updatePreview();
                 document.getElementById('devModal').style.display = 'block'; 
             } else { 
@@ -2198,6 +2332,11 @@
             loadData();
             updateSignatureOwner();
             initClickEffect();
+            
+            // 显示欢迎标语
+            setTimeout(() => {
+                showWelcomeBanner();
+            }, 500);
         };
     </script>
 </body>
