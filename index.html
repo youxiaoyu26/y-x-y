@@ -924,6 +924,17 @@
             height: 22px;
         }
 
+        /* 新增删除权限开关样式，复用 review-switch */
+        .delete-permission-switch {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f0f0f0;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-top: 8px;
+        }
+
         .effect-preview {
             width: 100%;
             height: 50px;
@@ -1295,7 +1306,7 @@
             </div>
         </div>
 
-        <!-- 新增：我的动态历史区域 -->
+        <!-- 我的动态历史区域 -->
         <div class="history-section" id="historySection" style="display: none;">
             <div class="history-header" onclick="toggleUserHistory()">
                 <div class="history-header-left">
@@ -1336,6 +1347,24 @@
             </div>
             <div style="font-size:10px; color:#666; margin-top:5px; padding:0 5px;">
                 开启后新用户注册需要管理员审核通过才能登录
+            </div>
+        </div>
+
+        <!-- 新增：允许删除他人动态开关 -->
+        <div style="background:#ffe0e0; padding:10px; border-radius:10px; margin-bottom:15px">
+            <label style="font-size:11px; font-weight:bold">🗑️ 删除他人动态</label>
+            <div class="delete-permission-switch">
+                <span class="mode-label">
+                    允许删除 
+                    <span class="status-badge" id="deleteOthersBadge" style="background:#999">关闭</span>
+                </span>
+                <label class="mode-toggle">
+                    <input type="checkbox" id="deleteOthersToggle" onchange="toggleDeleteOthers()">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            <div style="font-size:10px; color:#666; margin-top:5px; padding:0 5px;">
+                开启后可以删除任意用户发布的动态（无论是否为自己发布）
             </div>
         </div>
 
@@ -1473,6 +1502,7 @@
                 shape: "circle"
             },
             reviewMode: false,
+            allowDeleteOthers: false, // 新增：允许删除他人动态
             userBadges: {},
             userStatus: {}
         };
@@ -1483,6 +1513,7 @@
         let effectSettings = { color: "#F2A674", size: 30, shape: "circle" };
         let particles = [];
         let reviewMode = false;
+        let allowDeleteOthers = false; // 新增状态
         let userBadges = {};
         let userStatus = {};
         let currentSearchTerm = ''; // 当前用户管理搜索词
@@ -1678,6 +1709,17 @@
             if (document.getElementById('identityList').classList.contains('expanded')) {
                 renderUserList();
             }
+        }
+
+        // 新增：切换删除他人动态权限
+        function toggleDeleteOthers() {
+            const toggle = document.getElementById('deleteOthersToggle');
+            allowDeleteOthers = toggle.checked;
+            const badge = document.getElementById('deleteOthersBadge');
+            badge.innerText = allowDeleteOthers ? '开启' : '关闭';
+            badge.style.background = allowDeleteOthers ? '#ff4d4d' : '#999';
+            // 重新渲染动态列表以更新删除按钮显示
+            render(notes);
         }
 
         // 切换用户身份列表显示 - 带动画
@@ -2257,6 +2299,18 @@
                     }
                 }
                 
+                // 加载允许删除他人动态设置
+                if (d.record.allowDeleteOthers !== undefined) {
+                    allowDeleteOthers = d.record.allowDeleteOthers;
+                    const toggle = document.getElementById('deleteOthersToggle');
+                    if (toggle) {
+                        toggle.checked = allowDeleteOthers;
+                        const badge = document.getElementById('deleteOthersBadge');
+                        badge.innerText = allowDeleteOthers ? '开启' : '关闭';
+                        badge.style.background = allowDeleteOthers ? '#ff4d4d' : '#999';
+                    }
+                }
+                
                 if (d.record.userBadges) {
                     userBadges = d.record.userBadges;
                 }
@@ -2410,7 +2464,8 @@
                     return;
                 }
                 const post = notesData[noteIdx];
-                if (post.author !== currentUser) {
+                // 允许删除他人动态时跳过作者检查
+                if (!allowDeleteOthers && post.author !== currentUser) {
                     showAuthError("只能删除自己的动态");
                     return;
                 }
@@ -2427,7 +2482,8 @@
             const list = document.getElementById('msgList'); list.innerHTML = '';
             [...notesData].map((n, i) => ({...n, rIdx: i})).reverse().forEach(note => {
                 const div = document.createElement('div'); div.className = 'card';
-                const canDeletePost = currentUser && note.author === currentUser;
+                // 显示删除按钮的条件：已登录 且 (允许删除他人 或 是自己的动态)
+                const canDeletePost = currentUser && (allowDeleteOthers || note.author === currentUser);
                 const authorBadge = getUserBadge(note.author);
                 let imagesHtml = '';
                 if (note.images && note.images.length > 0) {
@@ -2438,7 +2494,7 @@
                     imagesHtml += '</div>';
                 }
                 const comms = (note.comments || []).map((c, ci) => {
-                    const canDeleteComment = currentUser && c.user === currentUser;
+                    const canDeleteComment = currentUser && c.user === currentUser; // 评论删除保持原逻辑
                     const commenterBadge = getUserBadge(c.user);
                     return `
                         <div class="comment-item">
@@ -2655,6 +2711,7 @@
                 updatedAt: new Date().toISOString()
             } : null;
             const reviewModeState = document.getElementById('reviewModeToggle').checked;
+            const deleteOthersState = document.getElementById('deleteOthersToggle').checked;
             await updateCloud({ 
                 ...data.record, 
                 settings: upd, 
@@ -2662,6 +2719,7 @@
                 signature: signatureData, 
                 users: users,
                 reviewMode: reviewModeState,
+                allowDeleteOthers: deleteOthersState,
                 userBadges: userBadges,
                 userStatus: userStatus
             }); 
@@ -2688,6 +2746,14 @@
                 const reviewBadge = document.getElementById('reviewModeBadge');
                 reviewBadge.innerText = reviewMode ? '开启' : '关闭';
                 reviewBadge.style.background = reviewMode ? '#4caf50' : '#ff9800';
+                
+                // 设置删除他人动态开关状态
+                const deleteToggle = document.getElementById('deleteOthersToggle');
+                deleteToggle.checked = allowDeleteOthers;
+                const deleteBadge = document.getElementById('deleteOthersBadge');
+                deleteBadge.innerText = allowDeleteOthers ? '开启' : '关闭';
+                deleteBadge.style.background = allowDeleteOthers ? '#ff4d4d' : '#999';
+                
                 renderUserList();
                 updatePreview();
                 document.getElementById('devModal').style.display = 'block'; 
