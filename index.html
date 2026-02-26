@@ -2479,7 +2479,13 @@
         }
 
         function render(notesData) {
-            const list = document.getElementById('msgList'); list.innerHTML = '';
+            const list = document.getElementById('msgList');
+            // 未登录用户无法查看任何动态
+            if (!currentUser) {
+                list.innerHTML = '<div class="card" style="text-align:center; color:#999; padding:20px;">🔒 请先登录查看动态</div>';
+                return;
+            }
+            list.innerHTML = '';
             [...notesData].map((n, i) => ({...n, rIdx: i})).reverse().forEach(note => {
                 const div = document.createElement('div'); div.className = 'card';
                 // 显示删除按钮的条件：已登录 且 (允许删除他人 或 是自己的动态)
