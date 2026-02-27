@@ -1478,6 +1478,13 @@
                 <button class="btn btn-refresh" onclick="loadData()"><span id="refreshIcon">↻</span></button>
             </div>
         </div>
+
+        <!-- 新增：动态搜索框，仅登录用户可见 -->
+        <div id="postSearchContainer" style="display: none; margin: 10px 0;">
+            <input type="text" id="postSearchInput" placeholder="搜索所有人发布的动态..." style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box;">
+            <button id="postSearchClear" style="margin-top: 5px; background: #f0f0f0; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer;">取消</button>
+        </div>
+
         <div id="msgList"></div>
     </div>
 
@@ -1520,6 +1527,7 @@
         let selectedImages = []; // 存储选择的图片文件 { file, preview }
         let notes = []; // 存储所有动态
         let userHistorySearchTerm = ''; // 历史记录搜索词
+        let postSearchTerm = ''; // 全局动态搜索词
 
         // 图片压缩函数
         function compressImage(file, maxWidth = 400, maxHeight = 400, quality = 0.6) {
@@ -1651,12 +1659,15 @@
                 greeting = '晚上好';
             }
             const username = currentUser || '朋友';
+            // 获取当前版本号（从公告栏元素）
+            const versionEl = document.getElementById('verDisplay');
+            const version = versionEl ? versionEl.innerText : 'v1.0.0';
             container.innerHTML = `
                 <div class="welcome-overlay">
                     <div class="welcome-content">
                         <div class="welcome-emoji">✨</div>
                         <div class="welcome-title">${greeting}，${username}</div>
-                        <div class="welcome-subtitle">欢迎回来姐姐的个人空间</div>
+                        <div class="welcome-subtitle">欢迎回来姐姐的个人空间  ${version}</div>
                     </div>
                 </div>
             `;
@@ -2359,6 +2370,9 @@
                 
                 updateSignatureOwner();
                 document.getElementById('status').innerText = "✨ 空间已刷新";
+                
+                // 数据加载完成后显示欢迎标语
+                showWelcomeBanner();
             } catch (e) { }
             setTimeout(() => icon.classList.remove('rotating'), 500);
         }
@@ -2540,6 +2554,87 @@
                 `;
                 list.appendChild(div);
             });
+        }
+
+        // 新增：过滤渲染动态（用于搜索）
+        function renderFiltered(notesData) {
+            const list = document.getElementById('msgList');
+            if (!currentUser) {
+                list.innerHTML = '<div class="card" style="text-align:center; color:#999; padding:20px;">🔒 请先登录查看动态</div>';
+                return;
+            }
+            list.innerHTML = '';
+            [...notesData].map((n, i) => ({...n, rIdx: n.originalIndex})).reverse().forEach(note => {
+                const div = document.createElement('div'); div.className = 'card';
+                const canDeletePost = currentUser && (allowDeleteOthers || note.author === currentUser);
+                const authorBadge = getUserBadge(note.author);
+                let imagesHtml = '';
+                if (note.images && note.images.length > 0) {
+                    imagesHtml = '<div class="post-images">';
+                    note.images.forEach(img => {
+                        imagesHtml += `<img src="${img}" class="post-image" onclick="showImageViewer('${img}')" alt="动态图片" oncontextmenu="return true">`;
+                    });
+                    imagesHtml += '</div>';
+                }
+                const comms = (note.comments || []).map((c, ci) => {
+                    const canDeleteComment = currentUser && c.user === currentUser;
+                    const commenterBadge = getUserBadge(c.user);
+                    return `
+                        <div class="comment-item">
+                            <div class="comment-content">
+                                <span class="comment-author" onclick="showUserProfile('${c.user}')">${c.user}</span>
+                                ${commenterBadge !== '普通用户' ? `<span class="user-badge-display">${commenterBadge}</span>` : ''}: ${c.content}
+                            </div>
+                            <div class="comment-actions">
+                                <span class="comment-like" onclick="handleLike(${note.originalIndex}, ${ci})">👍 ${c.likes || 0}</span>
+                                ${canDeleteComment ? `<span class="comment-delete" onclick="showDeleteConfirm('确定要删除这条评论吗？', 'deleteComment(${note.originalIndex}, ${ci})')" title="删除评论">🗑️</span>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                div.innerHTML = `
+                    <div class="card-header">
+                        <div class="card-header-left">
+                            <span class="author-name" onclick="showUserProfile('${note.author}')">👤 ${note.author}</span>
+                            ${authorBadge !== '普通用户' ? `<span class="user-badge-display">${authorBadge}</span>` : ''}
+                            <span class="post-time">${note.time}</span>
+                        </div>
+                        ${canDeletePost ? `<span class="post-delete-btn" onclick="showDeleteConfirm('确定要删除这条动态吗？', 'deletePost(${note.originalIndex})')" title="删除动态">🗑️</span>` : ''}
+                    </div>
+                    <div class="post-text">${note.content}</div>
+                    ${imagesHtml}
+                    <div class="action-bar">
+                        <div class="action-btn" onclick="handleLike(${note.originalIndex})">👍 ${note.likes || 0}</div>
+                        <div class="action-btn" onclick="toggleComments(${note.originalIndex})">💬 ${(note.comments || []).length}</div>
+                    </div>
+                    <div id="comments-${note.originalIndex}" style="display:none; margin-top:8px">
+                        ${comms}
+                        <div class="comment-input-group">
+                            <input type="text" id="comment-input-${note.originalIndex}" class="comment-input-field" placeholder="写评论...">
+                            <button class="comment-send-btn" onclick="submitComment(${note.originalIndex})">发</button>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        // 新增：处理动态搜索
+        function filterPosts() {
+            const term = document.getElementById('postSearchInput').value.trim().toLowerCase();
+            if (!term) {
+                render(notes);
+                return;
+            }
+            // 保留原始索引以便操作
+            const filtered = notes.map((note, idx) => ({...note, originalIndex: idx})).filter(note => note.content.toLowerCase().includes(term));
+            renderFiltered(filtered);
+        }
+
+        // 清除搜索
+        function clearPostSearch() {
+            document.getElementById('postSearchInput').value = '';
+            render(notes);
         }
 
         async function deleteComment(noteIdx, commentIdx) {
@@ -2781,6 +2876,8 @@
             document.getElementById('userInfo').style.display = currentUser ? 'block' : 'none'; 
             document.getElementById('loginForm').style.display = currentUser ? 'none' : 'block'; 
             if(currentUser) document.getElementById('currUser').innerText = currentUser; 
+            // 控制搜索框显示
+            document.getElementById('postSearchContainer').style.display = currentUser ? 'block' : 'none';
         }
         function toggleComments(id) { 
             const el = document.getElementById(`comments-${id}`); 
@@ -2806,9 +2903,10 @@
             loadData();
             updateSignatureOwner();
             initClickEffect();
-            setTimeout(() => {
-                showWelcomeBanner();
-            }, 500);
+            // 欢迎标语已在loadData成功后调用
+            // 绑定搜索事件
+            document.getElementById('postSearchInput').addEventListener('input', filterPosts);
+            document.getElementById('postSearchClear').addEventListener('click', clearPostSearch);
         };
     </script>
 </body>
