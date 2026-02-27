@@ -34,7 +34,30 @@
             z-index: 9999;
         }
         header { position: fixed; top: 0; width: 100%; height: 55px; background: rgba(255,255,255,0.85); backdrop-filter: blur(10px); display: flex; justify-content: space-between; align-items: center; padding: 0 15px; box-sizing: border-box; z-index: 1000; border-bottom: 1px solid rgba(0,0,0,0.05); }
-        .logo { color: var(--main); font-weight: bold; font-size: 1rem; }
+        .logo { color: var(--main); font-weight: bold; font-size: 1rem; cursor: pointer; }  /* 添加指针便于点击返回 */
+        /* 头部右侧组：工具按钮 + 菜单按钮 */
+        .header-right-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        /* 工具按钮样式 - 仅登录可见 */
+        .tool-btn {
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            color: var(--main);
+            padding: 0 5px;
+            display: none;  /* 默认隐藏，登录后显示 */
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            transition: opacity 0.2s;
+        }
+        .tool-btn:hover {
+            opacity: 0.8;
+        }
         .menu-btn { cursor: pointer; border: none; background: none; display: flex; flex-direction: column; gap: 4px; padding: 10px; }
         .menu-btn span { width: 20px; height: 2px; background: var(--main); border-radius: 2px; }
 
@@ -407,7 +430,7 @@
         .action-btn:first-child { border-right: 1px solid #f5f5f5; }
 
         /* 布局容器 */
-        .container { max-width: 480px; margin: 0 auto; padding: 0 12px; }
+        .container { max-width: 480px; margin: 0 auto; padding: 0 12px; transition: opacity 0.2s; }
         #status { font-size: 10px; color: #999; text-align: center; margin-bottom: 10px; height: 14px; }
         .input-card { background: rgba(255,255,255,0.9); padding: 15px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
         textarea { width: 100%; height: 60px; border: 1px solid #f0f0f0; padding: 10px; box-sizing: border-box; font-size: 14px; outline: none; resize: none; background: #fdfdfd; }
@@ -1224,6 +1247,66 @@
             font-size: 18px;
             opacity: 0.9;
         }
+
+        /* 新增工具界面样式 - 独立空白页 */
+        #toolInterface {
+            display: none;
+            position: fixed;
+            top: 55px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg);
+            z-index: 500;
+            padding: 20px;
+            overflow-y: auto;
+            box-sizing: border-box;
+        }
+        .tool-content {
+            max-width: 480px;
+            margin: 0 auto;
+            text-align: center;
+            color: #666;
+        }
+        .tool-content h2 {
+            color: var(--main);
+            margin-bottom: 20px;
+        }
+        .back-hint {
+            margin-top: 30px;
+            font-size: 12px;
+            color: #999;
+        }
+        /* AI女友长条按钮样式 */
+        .ai-girl-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--main);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: 0.2s;
+        }
+        .ai-girl-btn:hover {
+            opacity: 0.9;
+            transform: scale(0.98);
+        }
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .back-btn:hover {
+            background: #5a6268;
+        }
     </style>
 </head>
 <body>
@@ -1244,9 +1327,26 @@
     <div id="welcomeContainer"></div>
 
     <header>
-        <div class="logo">姐姐的个人空间</div>
-        <button class="menu-btn" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+        <!-- 左侧logo，点击返回主界面 -->
+        <div class="logo" onclick="hideToolInterface()">姐姐的个人空间</div>
+        <!-- 右侧组：工具按钮 + 菜单按钮 -->
+        <div class="header-right-group">
+            <button id="toolBtn" class="tool-btn" onclick="showToolInterface()" title="工具">🔧</button>
+            <button class="menu-btn" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+        </div>
     </header>
+
+    <!-- 工具界面 (独立空白页) -->
+    <div id="toolInterface">
+        <!-- 工具主页 -->
+        <div id="toolHome" style="display: block;">
+            <div class="tool-content">
+                <h2>🛠️ 工具界面</h2>
+                <p>工具页面测试阶段，温馨提示点击左边loog也能返回主页</p>
+                <button class="back-btn" onclick="hideToolInterface()">返回主页</button>
+            </div>
+        </div>
+    </div>
 
     <div id="overlay" onclick="closeAll()"></div>
 
@@ -1283,7 +1383,7 @@
             </div>
             <div id="userInfo" style="display:none">
                 <span style="font-size:12px">欢迎，<b id="currUser" style="color:var(--main)"></b></span>
-                <button class="btn" style="background:#eee; font-size:10px; padding:2px 8px; margin-left:5px" onclick="logout()">退出登录</button>
+                <button class="btn" style="background:#eee; font-size:10px; padding:2px 8px; margin-left:5px" onclick="logout()">注销</button>
             </div>
         </div>
 
@@ -1461,7 +1561,7 @@
         </div>
     </div>
 
-    <div class="container">
+    <div class="container" id="mainContainer">
         <div id="status">连接中...</div>
         <div class="input-card">
             <!-- 新布局：按钮在左侧，输入框在右侧 -->
@@ -1528,6 +1628,31 @@
         let notes = []; // 存储所有动态
         let userHistorySearchTerm = ''; // 历史记录搜索词
         let postSearchTerm = ''; // 全局动态搜索词
+
+        // 工具界面控制函数
+        function showToolInterface() {
+            if (!currentUser) return; // 仅登录用户可点，但按钮已隐藏，以防万一
+            document.getElementById('mainContainer').style.display = 'none';
+            document.getElementById('toolInterface').style.display = 'block';
+            // 每次显示工具界面时，确保显示工具主页
+            showToolHome();
+        }
+
+        function hideToolInterface() {
+            document.getElementById('mainContainer').style.display = 'block';
+            document.getElementById('toolInterface').style.display = 'none';
+        }
+
+        // 工具内子页面切换
+        function showAiGirlPage() {
+            document.getElementById('toolHome').style.display = 'none';
+            document.getElementById('aiGirlPage').style.display = 'block';
+        }
+
+        function showToolHome() {
+            document.getElementById('toolHome').style.display = 'block';
+            document.getElementById('aiGirlPage').style.display = 'none';
+        }
 
         // 图片压缩函数
         function compressImage(file, maxWidth = 400, maxHeight = 400, quality = 0.6) {
@@ -2871,6 +2996,10 @@
             // 更新历史区域显示
             updateUserHistorySection();
             loadData();
+            // 如果当前在工具界面，退出登录时自动返回主界面
+            if (document.getElementById('toolInterface').style.display === 'block') {
+                hideToolInterface();
+            }
         }
         function updateUserUI() { 
             document.getElementById('userInfo').style.display = currentUser ? 'block' : 'none'; 
@@ -2878,6 +3007,11 @@
             if(currentUser) document.getElementById('currUser').innerText = currentUser; 
             // 控制搜索框显示
             document.getElementById('postSearchContainer').style.display = currentUser ? 'block' : 'none';
+            // 控制工具按钮显示（仅登录用户可见）
+            const toolBtn = document.getElementById('toolBtn');
+            if (toolBtn) {
+                toolBtn.style.display = currentUser ? 'inline-flex' : 'none';
+            }
         }
         function toggleComments(id) { 
             const el = document.getElementById(`comments-${id}`); 
